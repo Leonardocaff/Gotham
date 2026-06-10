@@ -62,7 +62,11 @@ export function DrillDown({
       : CANDIDATE_COLOR[selection.data.leader];
 
   return (
-    <div className="glass-2 animate-fadeUp absolute right-3 top-3 z-10 w-[290px] p-4">
+    <div
+      className="glass-2 animate-fadeUp fixed inset-x-3 bottom-3 z-40 max-h-[70vh] overflow-y-auto p-4 sm:absolute sm:inset-x-auto sm:bottom-auto sm:right-3 sm:top-3 sm:z-10 sm:max-h-none sm:w-[290px] sm:overflow-visible"
+    >
+      {/* mobile grab handle affordance */}
+      <div className="mx-auto mb-3 h-1 w-10 rounded-full bg-edge-strong sm:hidden" />
       <header className="flex items-start justify-between gap-2">
         <div>
           <div className="flex items-center gap-2">
@@ -82,7 +86,7 @@ export function DrillDown({
         <button
           onClick={onClose}
           aria-label="Cerrar"
-          className="rounded-md border border-edge px-2 py-1 text-[11px] text-ink-3 transition-colors hover:border-edge-strong hover:text-ink-1"
+          className="rounded-md border border-edge px-3 py-1.5 text-[13px] text-ink-3 transition-colors hover:border-edge-strong hover:text-ink-1 active:bg-surface-3 sm:px-2 sm:py-1 sm:text-[11px]"
         >
           ✕
         </button>

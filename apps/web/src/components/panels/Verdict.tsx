@@ -16,11 +16,13 @@ function WinMeter({
   p,
   color,
   align,
+  compact,
 }: {
   label: string;
   p: number;
   color: string;
   align: "left" | "right";
+  compact?: boolean;
 }) {
   const value = p * 100;
   return (
@@ -31,7 +33,11 @@ function WinMeter({
       <LiveNum
         value={value}
         display={`${value.toFixed(1)}%`}
-        className="block text-4xl font-semibold leading-none sm:text-5xl"
+        className={
+          compact
+            ? "block text-2xl font-semibold leading-none sm:text-3xl"
+            : "block text-4xl font-semibold leading-none sm:text-5xl"
+        }
         color={color}
       />
       <div
@@ -48,13 +54,26 @@ function WinMeter({
   );
 }
 
-export function Verdict({ latest }: { latest: Latest }) {
+export function Verdict({
+  latest,
+  compact = false,
+}: {
+  latest: Latest;
+  /** HUD mode: tighter, stronger glass, floats over the globe. */
+  compact?: boolean;
+}) {
   const { projection } = latest;
   const leaderColor = CANDIDATE_COLOR[projection.leader];
   const dColor = decisionColor(projection.decision, leaderColor);
 
   return (
-    <section className="glass lift animate-fadeUp flex flex-col gap-5 p-5 sm:p-6">
+    <section
+      className={
+        compact
+          ? "hud-card lift animate-fadeUp flex w-[290px] max-w-[88vw] flex-col gap-4 p-4"
+          : "glass lift animate-fadeUp flex flex-col gap-5 p-5 sm:p-6"
+      }
+    >
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-3">
           <span className="text-[10px] uppercase tracking-[0.18em] text-ink-3">
@@ -71,30 +90,42 @@ export function Verdict({ latest }: { latest: Latest }) {
             {projection.decision}
           </span>
         </div>
-        <span className="text-[11px] uppercase tracking-[0.14em] text-ink-3">
-          Líder proyectado:{" "}
-          <span style={{ color: leaderColor }}>
-            {projection.leader === "sanchez" ? "Sánchez" : "Keiko"}
+        {!compact && (
+          <span className="text-[11px] uppercase tracking-[0.14em] text-ink-3">
+            Líder proyectado:{" "}
+            <span style={{ color: leaderColor }}>
+              {projection.leader === "sanchez" ? "Sánchez" : "Keiko"}
+            </span>
           </span>
-        </span>
+        )}
       </div>
 
-      <p className="max-w-3xl text-sm leading-relaxed text-ink-2">
-        {projection.decision_reason}
-      </p>
+      {!compact && (
+        <p className="max-w-3xl text-sm leading-relaxed text-ink-2">
+          {projection.decision_reason}
+        </p>
+      )}
 
-      <div className="grid grid-cols-2 items-end gap-6 sm:gap-12">
+      <div
+        className={
+          compact
+            ? "grid grid-cols-2 items-end gap-4"
+            : "grid grid-cols-2 items-end gap-6 sm:gap-12"
+        }
+      >
         <WinMeter
           label="P(victoria) Sánchez"
           p={projection.p_win.sanchez}
           color={CANDIDATE_COLOR.sanchez}
           align="left"
+          compact={compact}
         />
         <WinMeter
           label="P(victoria) Keiko"
           p={projection.p_win.keiko}
           color={CANDIDATE_COLOR.keiko}
           align="right"
+          compact={compact}
         />
       </div>
 

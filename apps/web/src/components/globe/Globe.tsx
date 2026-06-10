@@ -130,6 +130,12 @@ export default function Globe({
         pitch: 0,
         attributionControl: false,
         antialias: true,
+        // Touch: one-finger drag rotates the planet, two-finger pinch zooms.
+        // These are on by default but we make the intent explicit for mobile.
+        touchZoomRotate: true,
+        dragRotate: true,
+        touchPitch: false,
+        cooperativeGestures: false,
       });
     } catch (e) {
       // p.ej. WebGL no disponible/deshabilitado — degradar sin romper la app
@@ -150,14 +156,18 @@ export default function Globe({
     map.on("mousedown", stopSpin);
     map.on("touchstart", stopSpin);
     map.on("wheel", stopSpin);
+    map.on("dragstart", stopSpin);
 
     map.on("style.load", () => {
+      // Deeper "planet in space" atmosphere: near-black space, a soft cool
+      // horizon glow, and a touch more starlight so the globe edges read as
+      // a body floating in the void rather than a tile on a map.
       map.setFog({
-        color: "rgb(10,10,12)",
-        "high-color": "rgb(20,30,55)",
-        "horizon-blend": 0.06,
-        "space-color": "rgb(6,6,9)",
-        "star-intensity": 0.55,
+        color: "rgb(8,9,12)",
+        "high-color": "rgb(26,42,78)",
+        "horizon-blend": 0.09,
+        "space-color": "rgb(4,4,7)",
+        "star-intensity": 0.7,
       });
       setReady(true);
 
@@ -175,7 +185,19 @@ export default function Globe({
       spinRef.current = requestAnimationFrame(spin);
     });
 
+    // Keep the canvas correctly sized on orientation change / container reflow.
+    // The vh-based hero height changes on rotate without firing a window resize
+    // that Mapbox would otherwise catch, so we observe the container directly.
+    let raf = 0;
+    const ro = new ResizeObserver(() => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(() => map.resize());
+    });
+    if (containerRef.current) ro.observe(containerRef.current);
+
     return () => {
+      ro.disconnect();
+      cancelAnimationFrame(raf);
       if (spinRef.current) cancelAnimationFrame(spinRef.current);
       map.remove();
       mapRef.current = null;
@@ -449,7 +471,7 @@ export default function Globe({
 
   if (!TOKEN) {
     return (
-      <div className="relative flex h-full min-h-[420px] w-full items-center justify-center overflow-hidden rounded-2xl border border-edge bg-surface-1">
+      <div className="relative flex h-full min-h-[360px] w-full items-center justify-center overflow-hidden">
         <div
           className="pointer-events-none absolute inset-0 opacity-40"
           style={{
@@ -480,7 +502,7 @@ export default function Globe({
 
   if (failed) {
     return (
-      <div className="relative flex h-full min-h-[420px] w-full items-center justify-center overflow-hidden rounded-2xl border border-edge bg-surface-1 px-6 text-center">
+      <div className="relative flex h-full min-h-[360px] w-full items-center justify-center overflow-hidden px-6 text-center">
         <div>
           <h3 className="font-display text-sm uppercase tracking-[0.2em] text-ink-1">
             Globo no disponible
@@ -494,11 +516,14 @@ export default function Globe({
     );
   }
 
+  // Borderless: the globe floats directly in the canvas. A radial vignette
+  // overlay melts the planet's edges into the near-black void.
   return (
-    <div className="relative h-full min-h-[420px] w-full overflow-hidden rounded-2xl border border-edge">
+    <div className="relative h-full min-h-[360px] w-full overflow-hidden touch-pan-y">
       <div ref={containerRef} className="absolute inset-0" />
+      <div className="globe-vignette pointer-events-none absolute inset-0 z-[1]" />
       {!ready && (
-        <div className="absolute inset-0 flex items-center justify-center bg-surface-1">
+        <div className="absolute inset-0 flex items-center justify-center">
           <span className="font-mono text-[11px] uppercase tracking-[0.18em] text-ink-3">
             Cargando globo…
           </span>

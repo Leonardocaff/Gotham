@@ -11,8 +11,8 @@ export function Methods({ latest }: { latest: Latest }) {
       title="Métodos de proyección"
       hint="El método naíve favorece a Sánchez; los métodos rigurosos invierten a Keiko"
     >
-      <div className="overflow-x-auto">
-        <table className="w-full border-collapse text-left">
+      <div className="-mx-1 overflow-x-auto px-1">
+        <table className="w-full min-w-[420px] border-collapse text-left">
           <thead>
             <tr className="text-[10px] uppercase tracking-[0.12em] text-ink-3">
               <th className="pb-2 pr-3 font-medium">Método</th>

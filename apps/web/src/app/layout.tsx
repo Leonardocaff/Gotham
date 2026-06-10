@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter, JetBrains_Mono, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 
@@ -24,6 +24,12 @@ export const metadata: Metadata = {
   title: "GOTHAM — Inteligencia Electoral · 2da Vuelta Perú 2026",
   description:
     "Proyección estadística en vivo de la segunda vuelta presidencial 2026: Sánchez vs Fujimori.",
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  themeColor: "#0A0A0C",
 };
 
 export default function RootLayout({

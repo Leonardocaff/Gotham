@@ -40,15 +40,17 @@ function Counter({
     <div
       className={`flex min-w-0 flex-col ${right ? "items-end text-right" : "items-start text-left"}`}
     >
-      <div className="flex items-center gap-2">
+      <div className="flex min-w-0 items-center gap-2">
         <span
-          className="h-2.5 w-2.5 rounded-full"
+          className="h-2.5 w-2.5 shrink-0 rounded-full"
           style={{ backgroundColor: color, boxShadow: `0 0 12px ${color}aa` }}
         />
-        <span className="text-sm font-medium text-ink-1">{name}</span>
+        <span className="truncate text-[13px] font-medium text-ink-1 sm:text-sm">
+          {name}
+        </span>
         {leading && (
           <span
-            className="rounded border px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-[0.14em]"
+            className="shrink-0 rounded border px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-[0.14em]"
             style={{ color, borderColor: `${color}55`, backgroundColor: `${color}14` }}
           >
             Líder
@@ -60,7 +62,7 @@ function Counter({
       </span>
 
       <span
-        className={`tnum mt-3 font-mono text-[2.75rem] font-semibold leading-none tracking-tight sm:text-6xl ${
+        className={`tnum mt-3 max-w-full truncate font-mono text-[1.9rem] font-semibold leading-none tracking-tight sm:text-5xl lg:text-6xl ${
           flash ? "animate-flash" : ""
         }`}
         style={{
@@ -71,7 +73,7 @@ function Counter({
         {int(animated)}
       </span>
 
-      <div className="mt-2 flex items-center gap-2 font-mono text-[11px] tnum text-ink-3">
+      <div className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-0.5 font-mono text-[11px] tnum text-ink-3">
         <span style={{ color }}>{pct(finalPct, 2)}</span>
         <span className="text-ink-3">·</span>
         <span>
@@ -157,9 +159,9 @@ function HeadToHeadBar({
         </div>
       </div>
 
-      <div className="mt-2 flex items-center justify-between font-mono text-[10px] tnum text-ink-3">
+      <div className="mt-2 flex items-center justify-between gap-2 font-mono text-[10px] tnum text-ink-3">
         <span style={{ color: EMERALD }}>{int(sVotes)}</span>
-        <span className="flex items-center gap-1.5 text-[9px] uppercase tracking-[0.14em]">
+        <span className="hidden items-center gap-1.5 text-center text-[9px] uppercase tracking-[0.14em] sm:flex">
           <span
             className="inline-block h-2 w-2 rounded-[2px]"
             style={{
@@ -210,7 +212,7 @@ export function FinalVotesHero({ latest }: { latest: Latest }) {
       />
 
       <header className="relative mb-5 flex flex-wrap items-center justify-between gap-3">
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
           <h2 className="font-display text-sm font-semibold uppercase tracking-[0.16em] text-ink-1">
             Proyección Final · Votos
           </h2>
@@ -231,7 +233,7 @@ export function FinalVotesHero({ latest }: { latest: Latest }) {
         </span>
       </header>
 
-      <div className="relative grid grid-cols-2 items-start gap-4 sm:gap-10">
+      <div className="relative grid grid-cols-2 items-start gap-3 sm:gap-10">
         <Counter
           name="Roberto Sánchez"
           party={sCand.party}
@@ -271,7 +273,7 @@ export function FinalVotesHero({ latest }: { latest: Latest }) {
           <div className="text-[10px] uppercase tracking-[0.14em] text-ink-3">
             Ventaja líder
           </div>
-          <div className="tnum mt-1 font-mono text-lg" style={{ color: leaderColor }}>
+          <div className="tnum mt-1 font-mono text-base sm:text-lg" style={{ color: leaderColor }}>
             {int(leadVotes)}
           </div>
         </div>
@@ -280,7 +282,7 @@ export function FinalVotesHero({ latest }: { latest: Latest }) {
             Margen (votos)
           </div>
           <div
-            className="tnum mt-1 font-mono text-lg"
+            className="tnum mt-1 font-mono text-base sm:text-lg"
             style={{ color: marginVotes >= 0 ? EMERALD : CYAN }}
           >
             {signedInt(marginVotes)}
@@ -294,7 +296,7 @@ export function FinalVotesHero({ latest }: { latest: Latest }) {
             Margen (pp)
           </div>
           <div
-            className="tnum mt-1 font-mono text-lg"
+            className="tnum mt-1 font-mono text-base sm:text-lg"
             style={{ color: projection.final_margin.median_pct >= 0 ? EMERALD : CYAN }}
           >
             {signedPp(projection.final_margin.median_pct)}
@@ -307,7 +309,7 @@ export function FinalVotesHero({ latest }: { latest: Latest }) {
           <div className="text-[10px] uppercase tracking-[0.14em] text-ink-3">
             Total válidos proy.
           </div>
-          <div className="tnum mt-1 font-mono text-lg text-ink-1">{int(fv.total)}</div>
+          <div className="tnum mt-1 font-mono text-base text-ink-1 sm:text-lg">{int(fv.total)}</div>
           <div className="tnum mt-0.5 font-mono text-[10px] text-ink-3">
             {pct(latest.count.actasContabilizadasPct, 1)} actas
           </div>

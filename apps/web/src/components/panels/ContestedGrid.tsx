@@ -32,8 +32,8 @@ export function ContestedGrid({ latest }: { latest: Latest }) {
         </span>
       }
     >
-      <div className="overflow-x-auto">
-        <table className="w-full border-separate border-spacing-1 text-center">
+      <div className="-mx-1 overflow-x-auto px-1">
+        <table className="w-full min-w-[440px] border-separate border-spacing-1 text-center">
           <thead>
             <tr>
               <th className="text-[10px] font-medium uppercase tracking-wide text-ink-3">
@@ -61,7 +61,7 @@ export function ContestedGrid({ latest }: { latest: Latest }) {
                   return (
                     <td
                       key={`${cell.annul}-${cell.skew_pp}`}
-                      className="rounded-md px-2 py-2 transition-transform hover:scale-[1.04]"
+                      className="rounded-md px-2 py-2 transition-transform hover:scale-[1.04] active:scale-[0.98]"
                       style={{
                         backgroundColor: `${bg}33`,
                         border: `1px solid ${bg}66`,

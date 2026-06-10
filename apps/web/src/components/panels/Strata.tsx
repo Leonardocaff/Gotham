@@ -23,7 +23,7 @@ export function Strata({
   return (
     <Panel
       title="Departamentos"
-      hint="25 estratos domésticos — ordenados por intensidad del margen. Clic para enfocar."
+      hint="25 estratos domésticos — ordenados por intensidad del margen. Toca para enfocar."
     >
       <div className="max-h-[520px] space-y-0.5 overflow-y-auto pr-1">
         {rows.map((s) => {
@@ -34,11 +34,11 @@ export function Strata({
             <button
               key={s.code}
               onClick={() => onSelect(s)}
-              className={`group flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left transition-colors ${
+              className={`group flex w-full items-center gap-2 rounded-md px-2 py-2 text-left transition-colors active:bg-surface-3 sm:py-1.5 ${
                 sel ? "bg-surface-3" : "hover:bg-surface-3/60"
               }`}
             >
-              <span className="w-28 truncate text-xs text-ink-2 group-hover:text-ink-1">
+              <span className="w-24 truncate text-xs text-ink-2 group-hover:text-ink-1 sm:w-28">
                 {titleCase(s.name)}
               </span>
               <div className="flex h-1.5 flex-1 overflow-hidden rounded-full bg-surface-3">
