@@ -68,6 +68,43 @@ def _mapa_calor(c: OnpeClient, cod: int, ambito: int = 1) -> list[dict[str, Any]
     )
 
 
+def fetch_districts(c: OnpeClient) -> list[dict[str, Any]]:
+    """Los ~1,892 distritos del país en 2 llamadas (mapa-calor nivel_02 por candidato).
+
+    Cada item trae la jerarquía completa (ubigeoNivel01/02/03), votos de ambos
+    candidatos y la completitud del distrito — base para el drill profundo.
+    """
+    sanchez = c.get("resumen-general/mapa-calor", codigoAgrupacionPolitica=COD_SANCHEZ,
+                    idAmbitoGeografico=1, idEleccion=ID_ELECCION, ubigeoNivel01="",
+                    ubigeoNivel02="", ubigeoNivel03="", tipoFiltro="ubigeo_nivel_02")
+    keiko = {(r["ubigeoNivel01"], r["ubigeoNivel02"], r["ubigeoNivel03"]): r
+             for r in c.get("resumen-general/mapa-calor", codigoAgrupacionPolitica=COD_KEIKO,
+                            idAmbitoGeografico=1, idEleccion=ID_ELECCION, ubigeoNivel01="",
+                            ubigeoNivel02="", ubigeoNivel03="", tipoFiltro="ubigeo_nivel_02")}
+    out: list[dict[str, Any]] = []
+    for r in sanchez:
+        key = (r["ubigeoNivel01"], r["ubigeoNivel02"], r["ubigeoNivel03"])
+        kr = keiko.get(key)
+        if kr is None:
+            continue
+        out.append({
+            "dep_code": str(r["ubigeoNivel01"]).zfill(6),
+            "prov_code": str(r["ubigeoNivel02"]).zfill(6),
+            "dist_code": str(r["ubigeoNivel03"]).zfill(6),
+            "votos_sanchez": r["participante"]["totalVotosValidos"],
+            "votos_keiko": kr["participante"]["totalVotosValidos"],
+            "actas": r["actasContabilizadas"],
+            "pct_actas": r["porcentajeActasContabilizadas"],
+        })
+    return out
+
+
+def fetch_ubigeo_names(c: OnpeClient) -> dict[str, str]:
+    """ubigeo 6-dígitos → nombre 'DEPARTAMENTO \\ PROVINCIA \\ DISTRITO'."""
+    data = c.get("ubigeos/dep-prov-distritos", idEleccion=ID_ELECCION)
+    return {str(d["ubigeo"]).zfill(6): d["nombre"] for d in data}
+
+
 def fetch_exterior_strata(c: OnpeClient) -> list[dict[str, Any]]:
     """Estratos del exterior (ámbito 2) a granularidad de país/consulado.
 

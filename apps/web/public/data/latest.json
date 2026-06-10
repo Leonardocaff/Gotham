@@ -1,19 +1,19 @@
 {
-  "generatedAt": "2026-06-10T05:01:38.043957+00:00",
+  "generatedAt": "2026-06-10T05:34:05.654226+00:00",
   "source": {
     "idEleccion": 10,
     "portal": "resultadosegundavuelta.onpe.gob.pe",
-    "fechaActualizacion": 1781067360074
+    "fechaActualizacion": 1781069520082
   },
   "count": {
-    "actasContabilizadasPct": 96.658,
-    "actasEnJeePct": 1.676,
-    "actasPendientesPct": 1.666,
-    "contabilizadas": 89666,
+    "actasContabilizadasPct": 96.879,
+    "actasEnJeePct": 1.7,
+    "actasPendientesPct": 1.421,
+    "contabilizadas": 89871,
     "totalActas": 92766,
-    "participacionPct": 70.036,
-    "totalVotosValidos": 17886935,
-    "totalVotosEmitidos": 19137769
+    "participacionPct": 70.17,
+    "totalVotosValidos": 17920059,
+    "totalVotosEmitidos": 19174204
   },
   "candidates": [
     {
@@ -21,181 +21,181 @@
       "name": "Roberto Sánchez",
       "party": "Juntos por el Perú",
       "color": "#3DD9A0",
-      "votes": 8962948,
-      "pctValidos": 50.109
+      "votes": 8975703,
+      "pctValidos": 50.087
     },
     {
       "key": "keiko",
       "name": "Keiko Fujimori",
       "party": "Fuerza Popular",
       "color": "#4A9EFF",
-      "votes": 8923987,
-      "pctValidos": 49.891
+      "votes": 8944356,
+      "pctValidos": 49.913
     }
   ],
   "currentMargin": {
     "leader": "sanchez",
-    "votes": 38961,
-    "pct": 0.218
+    "votes": 31347,
+    "pct": 0.174
   },
   "projection": {
     "leader": "keiko",
     "p_win": {
-      "sanchez": 0.1107,
-      "keiko": 0.8893
+      "sanchez": 0.0448,
+      "keiko": 0.9552
     },
     "final_votes": {
       "sanchez": {
-        "median": 9189911,
+        "median": 9173713,
         "ci90": [
-          9166489,
-          9213334
+          9153116,
+          9194311
         ]
       },
       "keiko": {
-        "median": 9224730,
+        "median": 9216228,
         "ci90": [
-          9201308,
-          9248153
+          9195630,
+          9236826
         ]
       },
-      "total": 18414642
+      "total": 18389941
     },
     "final_pct": {
       "sanchez": {
-        "median": 49.905,
+        "median": 49.884,
         "ci90": [
-          49.778,
-          50.033
+          49.772,
+          49.996
         ]
       },
       "keiko": {
-        "median": 50.095,
+        "median": 50.116,
         "ci90": [
-          49.967,
-          50.222
+          50.004,
+          50.228
         ]
       }
     },
     "final_margin": {
-      "median_votes": -34819,
+      "median_votes": -42515,
       "ci90_votes": [
-        -81664,
-        12026
+        -83710,
+        -1319
       ],
-      "median_pct": -0.189,
+      "median_pct": -0.231,
       "ci90_pct": [
-        -0.443,
-        0.065
+        -0.455,
+        -0.007
       ]
     },
     "sd_components": {
-      "muestreo_votos": 7447,
-      "deriva_votos": 7916,
-      "impugnadas_votos": 9201
+      "muestreo_votos": 4553,
+      "deriva_votos": 7048,
+      "impugnadas_votos": 9295
     },
     "bounds": {
       "margin_votes": [
-        -488746,
-        566668
+        -438535,
+        501229
       ],
       "margin_pct": [
-        -2.65,
-        3.08
+        -2.38,
+        2.73
       ],
       "straddles_zero": true
     },
     "sensitivity": [
       {
         "delta_pp": -3.0,
-        "p_win_sanchez": 0.0098,
-        "margin_votes": -66481,
+        "p_win_sanchez": 0.0024,
+        "margin_votes": -70708,
         "leader": "keiko"
       },
       {
         "delta_pp": -2.0,
-        "p_win_sanchez": 0.0248,
-        "margin_votes": -55927,
+        "p_win_sanchez": 0.0072,
+        "margin_votes": -61310,
         "leader": "keiko"
       },
       {
         "delta_pp": -1.5,
-        "p_win_sanchez": 0.0377,
-        "margin_votes": -50650,
+        "p_win_sanchez": 0.0119,
+        "margin_votes": -56611,
         "leader": "keiko"
       },
       {
         "delta_pp": -1.0,
-        "p_win_sanchez": 0.0556,
-        "margin_votes": -45373,
+        "p_win_sanchez": 0.0191,
+        "margin_votes": -51912,
         "leader": "keiko"
       },
       {
         "delta_pp": -0.5,
-        "p_win_sanchez": 0.0796,
-        "margin_votes": -40096,
+        "p_win_sanchez": 0.0297,
+        "margin_votes": -47214,
         "leader": "keiko"
       },
       {
         "delta_pp": 0.0,
-        "p_win_sanchez": 0.1107,
-        "margin_votes": -34819,
+        "p_win_sanchez": 0.0448,
+        "margin_votes": -42515,
         "leader": "keiko"
       },
       {
         "delta_pp": 0.5,
-        "p_win_sanchez": 0.1498,
-        "margin_votes": -29542,
+        "p_win_sanchez": 0.0655,
+        "margin_votes": -37816,
         "leader": "keiko"
       },
       {
         "delta_pp": 1.0,
-        "p_win_sanchez": 0.1971,
-        "margin_votes": -24265,
+        "p_win_sanchez": 0.093,
+        "margin_votes": -33117,
         "leader": "keiko"
       },
       {
         "delta_pp": 1.5,
-        "p_win_sanchez": 0.2525,
-        "margin_votes": -18988,
+        "p_win_sanchez": 0.1283,
+        "margin_votes": -28418,
         "leader": "keiko"
       },
       {
         "delta_pp": 2.0,
-        "p_win_sanchez": 0.3151,
-        "margin_votes": -13711,
+        "p_win_sanchez": 0.1718,
+        "margin_votes": -23719,
         "leader": "keiko"
       },
       {
         "delta_pp": 3.0,
-        "p_win_sanchez": 0.4559,
-        "margin_votes": -3157,
+        "p_win_sanchez": 0.2837,
+        "margin_votes": -14322,
         "leader": "keiko"
       }
     ],
     "exterior": {
-      "actasPct": 66.11,
+      "actasPct": 70.73,
       "votos": {
-        "sanchez": 46436,
-        "keiko": 78390
+        "sanchez": 59191,
+        "keiko": 98759
       },
-      "pctSanchez": 37.2,
-      "remainingVotesEst": 195583,
-      "leanKeikoNetEst": 50067
+      "pctSanchez": 37.47,
+      "remainingVotesEst": 137758,
+      "leanKeikoNetEst": 34510
     },
     "contested": {
       "pools": {
-        "observadas_votos": 306699,
-        "observadas_actas": 1555,
+        "observadas_votos": 309846,
+        "observadas_actas": 1577,
         "domestico": {
           "observadas_votos": 299751,
           "pendientes_votos": 28070,
           "actas_observadas": 1495
         },
         "exterior": {
-          "observadas_votos": 6948,
-          "pendientes_votos": 162691,
-          "actas_observadas": 60
+          "observadas_votos": 10095,
+          "pendientes_votos": 145023,
+          "actas_observadas": 82
         }
       },
       "scenarios": {
@@ -215,19 +215,19 @@
             {
               "annul": 0.0,
               "skew_pp": -5.0,
-              "margin": -65489,
+              "margin": -73499,
               "leader": "keiko"
             },
             {
               "annul": 0.0,
               "skew_pp": 0.0,
-              "margin": -34819,
+              "margin": -42515,
               "leader": "keiko"
             },
             {
               "annul": 0.0,
               "skew_pp": 5.0,
-              "margin": -4149,
+              "margin": -11530,
               "leader": "keiko"
             }
           ],
@@ -235,19 +235,19 @@
             {
               "annul": 0.05,
               "skew_pp": -5.0,
-              "margin": -63926,
+              "margin": -71884,
               "leader": "keiko"
             },
             {
               "annul": 0.05,
               "skew_pp": 0.0,
-              "margin": -34790,
+              "margin": -42448,
               "leader": "keiko"
             },
             {
               "annul": 0.05,
               "skew_pp": 5.0,
-              "margin": -5654,
+              "margin": -13013,
               "leader": "keiko"
             }
           ],
@@ -255,19 +255,19 @@
             {
               "annul": 0.1,
               "skew_pp": -5.0,
-              "margin": -62364,
+              "margin": -70268,
               "leader": "keiko"
             },
             {
               "annul": 0.1,
               "skew_pp": 0.0,
-              "margin": -34761,
+              "margin": -42382,
               "leader": "keiko"
             },
             {
               "annul": 0.1,
               "skew_pp": 5.0,
-              "margin": -7158,
+              "margin": -14495,
               "leader": "keiko"
             }
           ],
@@ -275,19 +275,19 @@
             {
               "annul": 0.2,
               "skew_pp": -5.0,
-              "margin": -59239,
+              "margin": -67036,
               "leader": "keiko"
             },
             {
               "annul": 0.2,
               "skew_pp": 0.0,
-              "margin": -34703,
+              "margin": -42248,
               "leader": "keiko"
             },
             {
               "annul": 0.2,
               "skew_pp": 5.0,
-              "margin": -10167,
+              "margin": -17461,
               "leader": "keiko"
             }
           ]
@@ -296,48 +296,48 @@
       },
       "bounds_con_anulacion": {
         "margin_votes": [
-          -795445,
-          566668
+          -748381,
+          501229
         ],
         "margin_pct": [
-          -4.32,
-          3.08
+          -4.07,
+          2.73
         ],
         "straddles_zero": true
       },
       "nota_legal": "El conteo ONPE no es la proclamación del JNE. Los pedidos de NULIDAD ante el JNE (capa legal adversarial post-conteo) pueden anular o reasignar actas semanas después y NO están en esta proyección estadística."
     },
     "decision": "INDECIDIBLE",
-    "decision_reason": "El exterior está 66% contado (pool grande, pro-Keiko) y el margen proyectado es 0.19pp: pivota en data que aún no existe."
+    "decision_reason": "El exterior está 71% contado (pool grande, pro-Keiko) y el margen proyectado es 0.23pp: pivota en data que aún no existe."
   },
   "models": [
     {
       "key": "naive",
       "label": "Naíve (swing nacional)",
       "leader": "sanchez",
-      "final_pct_sanchez": 50.109,
-      "final_margin_votes": 40110
+      "final_pct_sanchez": 50.087,
+      "final_margin_votes": 32169
     },
     {
       "key": "stratified",
       "label": "Estratificado (población finita)",
       "leader": "keiko",
-      "final_pct_sanchez": 49.905,
-      "final_margin_votes": -34819
+      "final_pct_sanchez": 49.884,
+      "final_margin_votes": -42515
     },
     {
       "key": "closed_form",
       "label": "Forma cerrada (P, IC)",
       "leader": "keiko",
       "p_win": {
-        "sanchez": 0.1107,
-        "keiko": 0.8893
+        "sanchez": 0.0448,
+        "keiko": 0.9552
       },
-      "final_pct_sanchez": 49.905,
-      "final_margin_votes": -34819,
+      "final_pct_sanchez": 49.884,
+      "final_margin_votes": -42515,
       "ci90_margin_votes": [
-        -81664,
-        12026
+        -83710,
+        -1319
       ]
     },
     {
@@ -345,11 +345,11 @@
       "label": "Monte Carlo (verificación)",
       "leader": "keiko",
       "p_win": {
-        "sanchez": 0.1092,
-        "keiko": 0.8908
+        "sanchez": 0.0454,
+        "keiko": 0.9546
       },
-      "final_pct_sanchez": 49.906,
-      "final_margin_votes": -34714
+      "final_pct_sanchez": 49.885,
+      "final_margin_votes": -42367
     }
   ],
   "strata": [
@@ -696,13 +696,13 @@
       "code": "92",
       "name": "América",
       "votos": {
-        "sanchez": 24456,
-        "keiko": 52987
+        "sanchez": 37211,
+        "keiko": 73356
       },
-      "pctSanchez": 31.58,
+      "pctSanchez": 33.65,
       "leader": "keiko",
-      "actasPct": 63.19,
-      "remainingVotesEst": 135308
+      "actasPct": 70.23,
+      "remainingVotesEst": 77484
     },
     {
       "code": "93",

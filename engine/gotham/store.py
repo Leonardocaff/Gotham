@@ -11,7 +11,7 @@ import os
 from collections import defaultdict
 from datetime import datetime, timezone
 
-from .config import CANDIDATES, HISTORY_PATH, LATEST_PATH
+from .config import CANDIDATES, HIERARCHY_PATH, HISTORY_PATH, LATEST_PATH
 from .snapshot import Snapshot
 
 CAVEAT = (
@@ -128,6 +128,13 @@ def write_latest(contract: dict) -> None:
     os.makedirs(os.path.dirname(LATEST_PATH), exist_ok=True)
     with open(LATEST_PATH, "w", encoding="utf-8") as f:
         json.dump(contract, f, ensure_ascii=False, indent=2)
+
+
+def write_hierarchy(hierarchy: dict) -> None:
+    os.makedirs(os.path.dirname(HIERARCHY_PATH), exist_ok=True)
+    payload = {"generatedAt": datetime.now(timezone.utc).isoformat(), **hierarchy}
+    with open(HIERARCHY_PATH, "w", encoding="utf-8") as f:
+        json.dump(payload, f, ensure_ascii=False, separators=(",", ":"))
 
 
 def append_history(contract: dict) -> None:

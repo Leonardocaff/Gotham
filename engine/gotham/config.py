@@ -95,3 +95,4 @@ _ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__
 DATA_DIR = os.path.join(_ROOT, "apps", "web", "public", "data")
 LATEST_PATH = os.path.join(DATA_DIR, "latest.json")
 HISTORY_PATH = os.path.join(DATA_DIR, "history.jsonl")
+HIERARCHY_PATH = os.path.join(DATA_DIR, "hierarchy.json")

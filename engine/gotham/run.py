@@ -7,11 +7,12 @@ from __future__ import annotations
 
 import sys
 
+from . import hierarchy as hier
 from .ingest.client import OnpeClient, OnpeError
 from .models import ensemble
-from .publish import is_enabled, publish_all
+from .publish import is_enabled, publish_all, publish_hierarchy
 from .snapshot import build_snapshot
-from .store import append_history, build_contract, write_latest
+from .store import append_history, build_contract, write_hierarchy, write_latest
 
 
 def run_once(verbose: bool = True) -> dict:
@@ -21,8 +22,21 @@ def run_once(verbose: bool = True) -> dict:
     contract = build_contract(snap, result)
     write_latest(contract)
     append_history(contract)
+
+    # jerarquía geográfica viva (depto → provincia → distrito) para el drill profundo
+    try:
+        h = hier.build(c)
+        write_hierarchy(h)
+        if verbose:
+            print(f"  ✓ jerarquía: {h['counts']['departments']} deptos · "
+                  f"{h['counts']['provinces']} provincias · {h['counts']['districts']} distritos")
+    except Exception as e:  # noqa: BLE001 — no romper el ciclo principal por la jerarquía
+        if verbose:
+            print(f"  ! jerarquía falló: {e}")
+
     if is_enabled():
         u, _ = publish_all()
+        publish_hierarchy()
         if verbose and u:
             print(f"  ↑ publicado a Blob: {u}")
     if verbose:

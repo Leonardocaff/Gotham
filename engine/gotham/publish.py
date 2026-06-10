@@ -12,7 +12,7 @@ import os
 
 from curl_cffi import requests
 
-from .config import HISTORY_PATH, LATEST_PATH
+from .config import HIERARCHY_PATH, HISTORY_PATH, LATEST_PATH
 
 _API = "https://blob.vercel-storage.com/"
 _PREFIX = "gotham/"
@@ -23,7 +23,7 @@ def _token() -> str:
     return os.environ.get("BLOB_READ_WRITE_TOKEN", "").strip().strip('"')
 
 
-def _put(local_path: str, pathname: str, content_type: str) -> str | None:
+def _put(local_path: str, pathname: str, content_type: str, max_age: int = _MAX_AGE) -> str | None:
     token = _token()
     if not token or not os.path.exists(local_path):
         return None
@@ -37,7 +37,7 @@ def _put(local_path: str, pathname: str, content_type: str) -> str | None:
             "x-content-type": content_type,
             "x-add-random-suffix": "0",
             "x-allow-overwrite": "1",
-            "x-cache-control-max-age": str(_MAX_AGE),
+            "x-cache-control-max-age": str(max_age),
         },
         impersonate="chrome124", timeout=25,
     )
@@ -51,6 +51,11 @@ def publish_all() -> tuple[str | None, str | None]:
         _put(LATEST_PATH, "latest.json", "application/json"),
         _put(HISTORY_PATH, "history.jsonl", "application/x-ndjson"),
     )
+
+
+def publish_hierarchy() -> str | None:
+    """Sube hierarchy.json a Blob (cache más largo: cambia despacio, es grande)."""
+    return _put(HIERARCHY_PATH, "hierarchy.json", "application/json", max_age=60)
 
 
 def is_enabled() -> bool:
