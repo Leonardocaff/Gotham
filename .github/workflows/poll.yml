@@ -4,17 +4,28 @@ name: poll-onpe
 # runner de GitHub (curl_cffi funciona en Ubuntu), proyecta y publica latest.json,
 # history.jsonl y hierarchy.json a Vercel Blob, que es lo que lee el dashboard.
 #
-# El cron de GitHub es best-effort (~cada 5 min, puede demorarse). Para mitigar, cada
-# corrida hace ~4.5 min de ciclos de 60s, así durante la ventana hay frescura de ~60s.
+# ONPE bloquea por IP de datacenter de forma intermitente: a veces le sirve el SPA a un
+# runner. Como el bloqueo NO cambia dentro de una corrida pero SÍ entre corridas (IP
+# nueva), si el poll queda bloqueado toda la ventana (salida 3) re-disparamos la corrida
+# en un runner nuevo, hasta 4 intentos. Con ~50% de éxito por intento → ~94% en 4.
+# (Lo definitivo es un proxy residencial vía el secret ONPE_PROXY.)
 
 on:
   schedule:
     - cron: "*/5 * * * *"
-  workflow_dispatch: {}
+  workflow_dispatch:
+    inputs:
+      attempt:
+        description: "Intento (uso interno del re-disparo)"
+        default: "1"
 
 concurrency:
   group: poll-onpe
   cancel-in-progress: false
+
+permissions:
+  contents: read
+  actions: write # para re-disparar la corrida ante bloqueo de ONPE
 
 jobs:
   poll:
@@ -30,9 +41,18 @@ jobs:
       - name: Instalar dependencias
         run: pip install -r engine/requirements.txt
       - name: Pollear ONPE y publicar a Blob
+        id: poll
         working-directory: engine
         env:
           BLOB_READ_WRITE_TOKEN: ${{ secrets.BLOB_READ_WRITE_TOKEN }}
           ONPE_PROXY: ${{ secrets.ONPE_PROXY }}
-        # ~4.5 min de ciclos de 60s, luego sale; el siguiente cron reanuda.
-        run: timeout --preserve-status 270 python -u -m gotham.poll 60 || true
+        # ~4 min de ciclos de 60s. Sale 0 si publicó, 3 si ONPE bloqueó toda la ventana.
+        run: python -u -m gotham.poll 60 250
+      - name: Re-disparar en runner nuevo si ONPE bloqueó
+        if: failure() && fromJSON(github.event.inputs.attempt || '1') < 4
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          n=$(( ${{ github.event.inputs.attempt || '1' }} + 1 ))
+          echo "ONPE bloqueó este IP; re-disparando intento $n en un runner nuevo…"
+          gh workflow run poll.yml -f attempt="$n"

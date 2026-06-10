@@ -1,19 +1,19 @@
 {
-  "generatedAt": "2026-06-10T20:53:29.506425+00:00",
+  "generatedAt": "2026-06-10T23:12:08.954113+00:00",
   "source": {
     "idEleccion": 10,
     "portal": "resultadosegundavuelta.onpe.gob.pe",
-    "fechaActualizacion": 1781124360079
+    "fechaActualizacion": 1781132725467
   },
   "count": {
-    "actasContabilizadasPct": 97.891,
+    "actasContabilizadasPct": 97.916,
     "actasEnJeePct": 1.741,
-    "actasPendientesPct": 0.368,
-    "contabilizadas": 90810,
+    "actasPendientesPct": 0.343,
+    "contabilizadas": 90833,
     "totalActas": 92766,
-    "participacionPct": 70.577,
-    "totalVotosValidos": 18025568,
-    "totalVotosEmitidos": 19285475
+    "participacionPct": 70.584,
+    "totalVotosValidos": 18027396,
+    "totalVotosEmitidos": 19287438
   },
   "candidates": [
     {
@@ -21,155 +21,155 @@
       "name": "Roberto Sánchez",
       "party": "Juntos por el Perú",
       "color": "#3DD9A0",
-      "votes": 9017411,
-      "pctValidos": 50.026
+      "votes": 9018592,
+      "pctValidos": 50.027
     },
     {
       "key": "keiko",
       "name": "Keiko Fujimori",
       "party": "Fuerza Popular",
       "color": "#4A9EFF",
-      "votes": 9008157,
-      "pctValidos": 49.974
+      "votes": 9008804,
+      "pctValidos": 49.973
     }
   ],
   "currentMargin": {
     "leader": "sanchez",
-    "votes": 9254,
-    "pct": 0.052
+    "votes": 9788,
+    "pct": 0.054
   },
   "projection": {
     "leader": "keiko",
     "p_win": {
-      "sanchez": 0.0138,
-      "keiko": 0.9862
+      "sanchez": 0.013,
+      "keiko": 0.987
     },
     "final_votes": {
       "sanchez": {
-        "median": 9177556,
+        "median": 9177062,
         "ci90": [
-          9158882,
-          9196230
+          9158419,
+          9195705
         ]
       },
       "keiko": {
-        "median": 9227572,
+        "median": 9227551,
         "ci90": [
-          9208897,
-          9246246
+          9208908,
+          9246193
         ]
       },
-      "total": 18405128
+      "total": 18404613
     },
     "final_pct": {
       "sanchez": {
-        "median": 49.864,
+        "median": 49.863,
         "ci90": [
-          49.763,
-          49.966
+          49.762,
+          49.964
         ]
       },
       "keiko": {
-        "median": 50.136,
+        "median": 50.137,
         "ci90": [
-          50.034,
-          50.237
+          50.036,
+          50.238
         ]
       }
     },
     "final_margin": {
-      "median_votes": -50016,
+      "median_votes": -50489,
       "ci90_votes": [
-        -87364,
-        -12667
+        -87774,
+        -13203
       ],
-      "median_pct": -0.272,
+      "median_pct": -0.274,
       "ci90_pct": [
-        -0.475,
-        -0.069
+        -0.477,
+        -0.072
       ]
     },
     "sd_components": {
-      "muestreo_votos": 2792,
-      "deriva_votos": 5693,
-      "impugnadas_votos": 9417
+      "muestreo_votos": 2790,
+      "deriva_votos": 5658,
+      "impugnadas_votos": 9416
     },
     "bounds": {
       "margin_votes": [
-        -370306,
-        388814
+        -367429,
+        387005
       ],
       "margin_pct": [
-        -2.01,
-        2.11
+        -2.0,
+        2.1
       ],
       "straddles_zero": true
     },
     "sensitivity": [
       {
         "delta_pp": -3.0,
-        "p_win_sanchez": 0.0007,
-        "margin_votes": -72789,
+        "p_win_sanchez": 0.0006,
+        "margin_votes": -73122,
         "leader": "keiko"
       },
       {
         "delta_pp": -2.0,
-        "p_win_sanchez": 0.002,
-        "margin_votes": -65198,
+        "p_win_sanchez": 0.0019,
+        "margin_votes": -65577,
         "leader": "keiko"
       },
       {
         "delta_pp": -1.5,
-        "p_win_sanchez": 0.0034,
-        "margin_votes": -61402,
+        "p_win_sanchez": 0.0032,
+        "margin_votes": -61805,
         "leader": "keiko"
       },
       {
         "delta_pp": -1.0,
-        "p_win_sanchez": 0.0056,
-        "margin_votes": -57607,
+        "p_win_sanchez": 0.0052,
+        "margin_votes": -58033,
         "leader": "keiko"
       },
       {
         "delta_pp": -0.5,
-        "p_win_sanchez": 0.0089,
-        "margin_votes": -53811,
+        "p_win_sanchez": 0.0083,
+        "margin_votes": -54261,
         "leader": "keiko"
       },
       {
         "delta_pp": 0.0,
-        "p_win_sanchez": 0.0138,
-        "margin_votes": -50016,
+        "p_win_sanchez": 0.013,
+        "margin_votes": -50489,
         "leader": "keiko"
       },
       {
         "delta_pp": 0.5,
-        "p_win_sanchez": 0.0209,
-        "margin_votes": -46220,
+        "p_win_sanchez": 0.0197,
+        "margin_votes": -46716,
         "leader": "keiko"
       },
       {
         "delta_pp": 1.0,
-        "p_win_sanchez": 0.0309,
-        "margin_votes": -42424,
+        "p_win_sanchez": 0.0291,
+        "margin_votes": -42944,
         "leader": "keiko"
       },
       {
         "delta_pp": 1.5,
-        "p_win_sanchez": 0.0444,
-        "margin_votes": -38629,
+        "p_win_sanchez": 0.042,
+        "margin_votes": -39172,
         "leader": "keiko"
       },
       {
         "delta_pp": 2.0,
-        "p_win_sanchez": 0.0625,
-        "margin_votes": -34833,
+        "p_win_sanchez": 0.0592,
+        "margin_votes": -35400,
         "leader": "keiko"
       },
       {
         "delta_pp": 3.0,
-        "p_win_sanchez": 0.1151,
-        "margin_votes": -27242,
+        "p_win_sanchez": 0.1096,
+        "margin_votes": -27856,
         "leader": "keiko"
       }
     ],
@@ -185,11 +185,11 @@
     },
     "contested": {
       "pools": {
-        "observadas_votos": 313904,
+        "observadas_votos": 313859,
         "observadas_actas": 1615,
         "domestico": {
-          "observadas_votos": 299591,
-          "pendientes_votos": 8417,
+          "observadas_votos": 299547,
+          "pendientes_votos": 4208,
           "actas_observadas": 1495
         },
         "exterior": {
@@ -215,19 +215,19 @@
             {
               "annul": 0.0,
               "skew_pp": -5.0,
-              "margin": -81406,
+              "margin": -81874,
               "leader": "keiko"
             },
             {
               "annul": 0.0,
               "skew_pp": 0.0,
-              "margin": -50016,
+              "margin": -50489,
               "leader": "keiko"
             },
             {
               "annul": 0.0,
               "skew_pp": 5.0,
-              "margin": -18625,
+              "margin": -19103,
               "leader": "keiko"
             }
           ],
@@ -235,19 +235,19 @@
             {
               "annul": 0.05,
               "skew_pp": -5.0,
-              "margin": -79710,
+              "margin": -80179,
               "leader": "keiko"
             },
             {
               "annul": 0.05,
               "skew_pp": 0.0,
-              "margin": -49889,
+              "margin": -50363,
               "leader": "keiko"
             },
             {
               "annul": 0.05,
               "skew_pp": 5.0,
-              "margin": -20068,
+              "margin": -20546,
               "leader": "keiko"
             }
           ],
@@ -255,19 +255,19 @@
             {
               "annul": 0.1,
               "skew_pp": -5.0,
-              "margin": -78014,
+              "margin": -78484,
               "leader": "keiko"
             },
             {
               "annul": 0.1,
               "skew_pp": 0.0,
-              "margin": -49763,
+              "margin": -50237,
               "leader": "keiko"
             },
             {
               "annul": 0.1,
               "skew_pp": 5.0,
-              "margin": -21511,
+              "margin": -21989,
               "leader": "keiko"
             }
           ],
@@ -275,19 +275,19 @@
             {
               "annul": 0.2,
               "skew_pp": -5.0,
-              "margin": -74622,
+              "margin": -75093,
               "leader": "keiko"
             },
             {
               "annul": 0.2,
               "skew_pp": 0.0,
-              "margin": -49510,
+              "margin": -49985,
               "leader": "keiko"
             },
             {
               "annul": 0.2,
               "skew_pp": 5.0,
-              "margin": -24398,
+              "margin": -24876,
               "leader": "keiko"
             }
           ]
@@ -296,48 +296,48 @@
       },
       "bounds_con_anulacion": {
         "margin_votes": [
-          -684209,
-          388814
+          -681287,
+          387005
         ],
         "margin_pct": [
-          -3.72,
-          2.11
+          -3.7,
+          2.1
         ],
         "straddles_zero": true
       },
       "nota_legal": "El conteo ONPE no es la proclamación del JNE. Los pedidos de NULIDAD ante el JNE (capa legal adversarial post-conteo) pueden anular o reasignar actas semanas después y NO están en esta proyección estadística."
     },
     "decision": "INCLINADO",
-    "decision_reason": "P(Keiko)=99%: Keiko favorito claro y robusto a la deriva, pero margen 0.27pp con 97.9% contado aún puede moverse; no alcanza el umbral de cierre."
+    "decision_reason": "Keiko es favorito (P=99%) y aguanta la deriva, pero el margen es de solo 0.27pp y con 97.9% contado todavía se puede mover."
   },
   "models": [
     {
       "key": "naive",
       "label": "Naíve (swing nacional)",
       "leader": "sanchez",
-      "final_pct_sanchez": 50.026,
-      "final_margin_votes": 9449
+      "final_pct_sanchez": 50.027,
+      "final_margin_votes": 9993
     },
     {
       "key": "stratified",
       "label": "Estratificado (población finita)",
       "leader": "keiko",
-      "final_pct_sanchez": 49.864,
-      "final_margin_votes": -50016
+      "final_pct_sanchez": 49.863,
+      "final_margin_votes": -50489
     },
     {
       "key": "closed_form",
       "label": "Forma cerrada (P, IC)",
       "leader": "keiko",
       "p_win": {
-        "sanchez": 0.0138,
-        "keiko": 0.9862
+        "sanchez": 0.013,
+        "keiko": 0.987
       },
-      "final_pct_sanchez": 49.864,
-      "final_margin_votes": -50016,
+      "final_pct_sanchez": 49.863,
+      "final_margin_votes": -50489,
       "ci90_margin_votes": [
-        -87364,
-        -12667
+        -87774,
+        -13203
       ]
     },
     {
@@ -345,11 +345,11 @@
       "label": "Monte Carlo (verificación)",
       "leader": "keiko",
       "p_win": {
-        "sanchez": 0.013,
-        "keiko": 0.987
+        "sanchez": 0.0134,
+        "keiko": 0.9866
       },
-      "final_pct_sanchez": 49.864,
-      "final_margin_votes": -50061
+      "final_pct_sanchez": 49.863,
+      "final_margin_votes": -50596
     }
   ],
   "strata": [
@@ -541,12 +541,12 @@
       "region": "selva",
       "rural": true,
       "votos": {
-        "sanchez": 185991,
-        "keiko": 210486
+        "sanchez": 187060,
+        "keiko": 210961
       },
-      "pctSanchez": 46.91,
+      "pctSanchez": 47.0,
       "leader": "keiko",
-      "actasPct": 97.59
+      "actasPct": 98.27
     },
     {
       "code": "160000",
@@ -1751,19 +1751,19 @@
         "label": "Benford 2º dígito (2BL)",
         "verdict": "NORMAL",
         "n": 3780,
-        "chi2": 10.27,
+        "chi2": 10.42,
         "df": 9,
-        "pvalue": 0.32898974670158476,
-        "mad": 0.00417,
+        "pvalue": 0.31742680220209124,
+        "mad": 0.00427,
         "observed": [
-          0.1153,
-          0.1069,
+          0.1148,
+          0.1066,
           0.1074,
-          0.0966,
-          0.1,
-          0.0979,
+          0.0971,
+          0.0997,
+          0.0981,
           0.1034,
-          0.0958,
+          0.096,
           0.0892,
           0.0876
         ],
@@ -1791,28 +1791,28 @@
           8,
           9
         ],
-        "detail": "χ²=10.3 (df=9), p=0.329, MAD=0.0042, N=3780.",
-        "caveat": "2BL (Mebane) es el test preferido en forense electoral, pero un rechazo NO prueba fraude: la heterogeneidad de tamaños distritales puede desviarlo. Es un tamiz, no veredicto."
+        "detail": "χ²=10.4 (df=9), p=0.317, MAD=0.0043, N=3780.",
+        "caveat": "2BL (Mebane) es el test preferido en forense electoral, pero un rechazo solo orienta la auditoría: la heterogeneidad de tamaños distritales puede desviarlo por sí sola."
       },
       {
         "key": "benford1_pooled",
         "label": "Benford 1er dígito",
         "verdict": "NORMAL",
         "n": 3780,
-        "chi2": 9.7,
+        "chi2": 9.77,
         "df": 8,
-        "pvalue": 0.28654026689467754,
-        "mad": 0.00322,
+        "pvalue": 0.28176393114174914,
+        "mad": 0.00328,
         "observed": [
-          0.3011,
+          0.3013,
           0.1759,
           0.1394,
-          0.095,
+          0.0947,
           0.078,
           0.0627,
           0.0524,
-          0.0505,
-          0.045
+          0.0508,
+          0.0447
         ],
         "expected": [
           0.301,
@@ -1836,7 +1836,7 @@
           8,
           9
         ],
-        "detail": "χ²=9.7 (df=8), p=0.287, MAD=0.0032, N=3780.",
+        "detail": "χ²=9.8 (df=8), p=0.282, MAD=0.0033, N=3780.",
         "caveat": "La ley de Benford sobre datos electorales produce falsos positivos (Deckert et al. 2011). Suplementario; se pondera por debajo del 2BL."
       },
       {
@@ -1844,21 +1844,21 @@
         "label": "Último dígito uniforme",
         "verdict": "NORMAL",
         "n": 3595,
-        "chi2": 13.04,
+        "chi2": 12.88,
         "df": 9,
-        "pvalue": 0.16097681588197035,
-        "mad": 0.00562,
+        "pvalue": 0.16809362675737985,
+        "mad": 0.00556,
         "observed": [
-          0.1071,
+          0.1068,
           0.111,
           0.0951,
           0.1068,
-          0.0968,
+          0.0971,
           0.1032,
-          0.0954,
-          0.0946,
-          0.0946,
-          0.0954
+          0.0957,
+          0.0943,
+          0.0943,
+          0.0957
         ],
         "expected": [
           0.1,
@@ -1884,27 +1884,27 @@
           8,
           9
         ],
-        "detail": "χ²=13.0 (df=9), p=0.161, MAD=0.0056, N=3595.",
+        "detail": "χ²=12.9 (df=9), p=0.168, MAD=0.0056, N=3595.",
         "caveat": "Potente a nivel MESA; aquí los totales distritales son sumas de ~48 actas, y sumar uniformiza el último dígito → test conservador, de baja potencia (rara vez detecta, casi nunca falso-positivo)."
       }
     ],
     "ledger": {
       "totalActas": 92766,
-      "countedActas": 90810,
+      "countedActas": 90833,
       "observedActas": 1615,
-      "pendingActas": 341,
-      "observedVotesEst": 313904,
-      "pendingVotesEst": 43839,
-      "disputedVotesEst": 357743,
-      "marginVotes": 9254,
+      "pendingActas": 318,
+      "observedVotesEst": 313859,
+      "pendingVotesEst": 39630,
+      "disputedVotesEst": 353489,
+      "marginVotes": 9788,
       "poolCanFlip": true,
-      "swingNeededFrac": 0.026
+      "swingNeededFrac": 0.028
     },
     "overall": {
       "verdict": "SIN INDICIOS",
-      "summary": "Ningún tamiz de dígitos (Benford 2BL/1BL, último dígito) se desvía de forma significativa y material del conteo limpio esperado. No hay evidencia estadística de manipulación en los datos publicados. La incertidumbre del resultado es muestral y de completitud, no de integridad."
+      "summary": "Las tres pruebas de dígitos (Benford 1° y 2° dígito, último dígito) salen limpias. No hay rastro estadístico de manipulación en lo publicado. Lo único que queda abierto es cuánto falta por contar."
     },
-    "disclaimer": "Forense estadístico de tamizaje. Estos tests NO prueban fraude — señalan dónde mirar. La proclamación y la validez legal de las actas competen al JNE, no a este modelo."
+    "disclaimer": "Es un tamiz estadístico. Ninguna de estas señales acusa fraude por sí sola; solo dicen dónde mirar. Quien valida y proclama las actas es el JNE."
   },
-  "caveat": "Proyección estadística, NO resultado oficial. El conteo ONPE no es la proclamación del JNE (semanas después). Las actas en JEE/pendientes pueden anularse o reasignarse. Con <97% de actas y margen sub-0.5pp, el resultado es genuinamente indecidible."
+  "caveat": "El resultado oficial lo da el JNE semanas después, cuando termina de resolver las actas observadas y los pedidos de nulidad. Esto es una proyección estadística sobre el conteo de ONPE. Con menos del 97% contado y un margen bajo 0.5pp, la elección sigue abierta."
 }
