@@ -48,6 +48,17 @@ interface GlobeProps {
 type PointFC = FeatureCollection<Point, Record<string, unknown>>;
 type PolyFC = FeatureCollection<Geometry, Record<string, unknown>>;
 
+interface HoverInfo {
+  name: string;
+  pctSanchez: number;
+  leader: "sanchez" | "keiko";
+  actasPct: number;
+  votosS: number;
+  votosK: number;
+  x: number;
+  y: number;
+}
+
 function deptNameFromProps(props: Record<string, unknown> | null): string | null {
   if (!props) return null;
   for (const f of GEOJSON_NAME_FIELDS) {
@@ -141,6 +152,7 @@ export default function Globe({
   const [ready, setReady] = useState(false);
   const [polyReady, setPolyReady] = useState(false);
   const [failed, setFailed] = useState(false);
+  const [hover, setHover] = useState<HoverInfo | null>(null);
   const strataRef = useRef(strata);
   const continentsRef = useRef(continents);
   const onSelectRef = useRef(onSelect);
@@ -455,6 +467,33 @@ export default function Globe({
             },
             "continents-halo",
           );
+          // Hover highlight — un realce sobre el departamento bajo el cursor:
+          // un brillo del fill + un contorno suave (distinto del seleccionado).
+          map.addLayer(
+            {
+              id: "depts-hover-fill",
+              type: "fill",
+              source: "depts",
+              filter: ["==", ["get", "g_code"], "__none__"],
+              paint: { "fill-color": "#FFFFFF", "fill-opacity": 0.18 },
+            },
+            "continents-halo",
+          );
+          map.addLayer(
+            {
+              id: "depts-hover",
+              type: "line",
+              source: "depts",
+              filter: ["==", ["get", "g_code"], "__none__"],
+              paint: {
+                "line-color": "#F5F5F7",
+                "line-width": 2.2,
+                "line-opacity": 0.6,
+                "line-blur": 0.4,
+              },
+            },
+            "continents-halo",
+          );
           setPolyReady(true);
         }
       }
@@ -548,6 +587,49 @@ export default function Globe({
         map.on("mouseleave", l, () => {
           map.getCanvas().style.cursor = "";
         });
+      }
+
+      // ── HOVER de departamentos: resalta la unidad bajo el cursor y muestra un
+      // tooltip con su data viva (split, líder, % actas). ──
+      const setHoverCode = (code: string | null) => {
+        const f = ["==", ["get", "g_code"], code ?? "__none__"];
+        for (const id of ["depts-hover", "depts-hover-fill"]) {
+          if (map.getLayer(id)) map.setFilter(id, f as never);
+        }
+      };
+      const onDeptMove = (e: MapMouseEvent) => {
+        const f = e.features?.[0];
+        const code = (f?.properties?.g_code ?? f?.properties?.code) as
+          | string
+          | undefined;
+        const s = code
+          ? strataRef.current.find((x) => x.code === code)
+          : undefined;
+        if (!s) {
+          setHoverCode(null);
+          setHover(null);
+          return;
+        }
+        setHoverCode(s.code);
+        setHover({
+          name: s.name,
+          pctSanchez: s.pctSanchez,
+          leader: s.leader,
+          actasPct: s.actasPct,
+          votosS: s.votos.sanchez,
+          votosK: s.votos.keiko,
+          x: e.point.x,
+          y: e.point.y,
+        });
+      };
+      const onDeptLeave = () => {
+        setHoverCode(null);
+        setHover(null);
+        map.getCanvas().style.cursor = "";
+      };
+      if (map.getLayer("depts-fill")) {
+        map.on("mousemove", "depts-fill", onDeptMove);
+        map.on("mouseleave", "depts-fill", onDeptLeave);
       }
 
       // ── Contested halo pulse loop ─────────────────────────────────────────
@@ -680,6 +762,42 @@ export default function Globe({
           globo invisible. La altura explícita resuelve contra el contenedor (h-full). */}
       <div ref={containerRef} className="absolute inset-0 h-full w-full" />
       <div className="globe-vignette pointer-events-none absolute inset-0 z-[1]" />
+
+      {/* Tooltip de hover — sigue al cursor con la data viva del departamento. */}
+      {hover && (
+        <div
+          className="pointer-events-none absolute z-30 w-44 -translate-y-full rounded-lg border border-edge-strong bg-[rgba(10,10,14,0.88)] px-3 py-2 shadow-xl backdrop-blur-md"
+          style={{
+            left: Math.max(8, Math.min(hover.x + 14, (containerRef.current?.clientWidth ?? 9999) - 184)),
+            top: Math.max(64, hover.y - 12),
+          }}
+        >
+          <div className="flex items-center justify-between gap-2">
+            <span className="truncate font-display text-[11px] font-semibold uppercase tracking-[0.1em] text-ink-1">
+              {hover.name}
+            </span>
+            <span
+              className="shrink-0 rounded px-1 py-0.5 text-[8px] font-semibold uppercase tracking-wide"
+              style={{
+                color: leaderColor(hover.leader, 0),
+                backgroundColor: `${leaderColor(hover.leader, 0)}1f`,
+              }}
+            >
+              {hover.leader === "sanchez" ? "Sánchez" : "Keiko"}
+            </span>
+          </div>
+          <div className="mt-1.5 flex h-1.5 w-full overflow-hidden rounded-full bg-surface-3">
+            <div style={{ width: `${hover.pctSanchez}%`, backgroundColor: "#3DD9A0" }} />
+            <div style={{ width: `${100 - hover.pctSanchez}%`, backgroundColor: "#4A9EFF" }} />
+          </div>
+          <div className="mt-1.5 flex items-center justify-between font-mono text-[10px] tnum">
+            <span style={{ color: "#3DD9A0" }}>{hover.pctSanchez.toFixed(1)}%</span>
+            <span className="text-ink-3">{hover.actasPct.toFixed(0)}% actas</span>
+            <span style={{ color: "#4A9EFF" }}>{(100 - hover.pctSanchez).toFixed(1)}%</span>
+          </div>
+        </div>
+      )}
+
       {!ready && (
         <div className="absolute inset-0 flex items-center justify-center">
           <span className="font-mono text-[11px] uppercase tracking-[0.18em] text-ink-3">
