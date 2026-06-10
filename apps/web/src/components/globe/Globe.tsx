@@ -520,7 +520,10 @@ export default function Globe({
   // overlay melts the planet's edges into the near-black void.
   return (
     <div className="relative h-full min-h-[360px] w-full overflow-hidden touch-pan-y">
-      <div ref={containerRef} className="absolute inset-0" />
+      {/* h-full w-full es clave: el CSS de Mapbox fuerza position:relative sobre este
+          div (.mapboxgl-map) y anula `absolute inset-0`, colapsando la altura a 0 →
+          globo invisible. La altura explícita resuelve contra el contenedor (h-full). */}
+      <div ref={containerRef} className="absolute inset-0 h-full w-full" />
       <div className="globe-vignette pointer-events-none absolute inset-0 z-[1]" />
       {!ready && (
         <div className="absolute inset-0 flex items-center justify-center">
