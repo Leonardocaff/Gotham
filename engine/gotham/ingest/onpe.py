@@ -28,6 +28,29 @@ def fetch_national(c: OnpeClient) -> tuple[dict[str, Any], list[dict[str, Any]]]
     return c.get("resumen-general/totales", **p), c.get("resumen-general/participantes", **p)
 
 
+def fetch_ambito_status(c: OnpeClient, ambito: int) -> dict[str, Any]:
+    """Estado de actas de un ámbito (1=doméstico, 2=exterior): observadas vs pendientes.
+
+    ONPE no expone el desglose observadas/pendientes por provincia (el filtro geográfico
+    de `totales` se ignora), pero sí por ámbito. Es la granularidad disponible para
+    cuantificar el pool en disputa (annulment-risk) por separado del meramente lento.
+    """
+    d = c.get(
+        "resumen-general/totales",
+        idEleccion=ID_ELECCION, tipoFiltro="ambito_geografico", idAmbitoGeografico=ambito,
+        ubigeoNivel1="", ubigeoNivel2="", ubigeoNivel3="",
+    )
+    contab = max(int(d.get("contabilizadas", 0)), 1)
+    vpa = d.get("totalVotosValidos", 0) / contab        # votos por acta del ámbito
+    return {
+        "observadas": int(d.get("enviadasJee", 0)),     # actas en JEE (impugnadas/observadas)
+        "pendientes": int(d.get("pendientesJee", 0)),   # actas pendientes (lentas)
+        "votos_observados_est": d.get("enviadasJee", 0) * vpa,
+        "votos_pendientes_est": d.get("pendientesJee", 0) * vpa,
+        "votos_por_acta": vpa,
+    }
+
+
 def fetch_departamentos_meta(c: OnpeClient) -> dict[str, str]:
     """Código ubigeo nivel-01 (int como string, p.ej. '140000') → nombre departamento."""
     data = c.get("ubigeos/departamentos", idEleccion=ID_ELECCION, idAmbitoGeografico=1)

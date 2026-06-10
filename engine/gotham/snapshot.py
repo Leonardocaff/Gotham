@@ -11,6 +11,7 @@ from typing import Any
 from .config import CANDIDATES, region_for
 from .ingest.client import OnpeClient
 from .ingest.onpe import (
+    fetch_ambito_status,
     fetch_departamentos_meta,
     fetch_exterior_strata,
     fetch_national,
@@ -82,6 +83,18 @@ class Snapshot:
     ext_votos_sanchez: int = 0
     ext_votos_keiko: int = 0
     ext_actas_pct: float = 0.0
+    # actas en disputa (observadas/JEE) vs pendientes (lentas), por ámbito — pools en VOTOS
+    obs_votes_dom: float = 0.0
+    pend_votes_dom: float = 0.0
+    obs_votes_ext: float = 0.0
+    pend_votes_ext: float = 0.0
+    obs_actas_dom: int = 0
+    obs_actas_ext: int = 0
+
+    @property
+    def contested_votes(self) -> float:
+        """Total de votos en actas observadas/impugnadas (annulment-risk)."""
+        return self.obs_votes_dom + self.obs_votes_ext
 
     @property
     def margin_votes(self) -> int:
@@ -105,6 +118,8 @@ def build_snapshot(c: OnpeClient) -> Snapshot:
     meta = fetch_departamentos_meta(c)
     provincias = fetch_provincias(c)
     exterior = fetch_exterior_strata(c)
+    st_dom = fetch_ambito_status(c, 1)
+    st_ext = fetch_ambito_status(c, 2)
 
     by_key: dict[str, dict[str, Any]] = {}
     for p in participantes:
@@ -157,4 +172,10 @@ def build_snapshot(c: OnpeClient) -> Snapshot:
         ext_votos_sanchez=ext_s,
         ext_votos_keiko=ext_k,
         ext_actas_pct=ext_pct,
+        obs_votes_dom=st_dom["votos_observados_est"],
+        pend_votes_dom=st_dom["votos_pendientes_est"],
+        obs_votes_ext=st_ext["votos_observados_est"],
+        pend_votes_ext=st_ext["votos_pendientes_est"],
+        obs_actas_dom=st_dom["observadas"],
+        obs_actas_ext=st_ext["observadas"],
     )

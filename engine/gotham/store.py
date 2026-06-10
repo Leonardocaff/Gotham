@@ -84,7 +84,8 @@ def build_contract(snap: Snapshot, result: dict) -> dict:
         },
         "projection": {k: result[k] for k in
                        ("leader", "p_win", "final_pct", "final_margin", "sd_components",
-                        "bounds", "sensitivity", "exterior", "decision", "decision_reason")},
+                        "bounds", "sensitivity", "exterior", "contested",
+                        "decision", "decision_reason")},
         "models": result["models"],
         "strata": _departments(snap),
         "caveat": CAVEAT,

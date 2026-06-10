@@ -41,8 +41,13 @@ def _print_summary(c: dict) -> None:
               f"margen {m['final_margin_votes']:+,}{pw}  → {m['leader']}")
     fm = proj["final_margin"]
     print(f"  PROYECC (forma cerrada, δ=0)  Sánchez {proj['final_pct']['sanchez']['median']:.3f}%")
+    sc = proj["sd_components"]
     print(f"  MARGEN  {fm['median_votes']:+,} votos  IC90 [{fm['ci90_votes'][0]:,}, {fm['ci90_votes'][1]:,}]"
-          f"   (sd: muestreo {proj['sd_components']['muestreo_votos']:,} + deriva {proj['sd_components']['deriva_votos']:,})")
+          f"   (sd: muestreo {sc['muestreo_votos']:,} + deriva {sc['deriva_votos']:,} + impugnadas {sc['impugnadas_votos']:,})")
+    con = proj["contested"]
+    print(f"  IMPUGNADAS  {con['pools']['observadas_actas']:,} actas observadas ≈ "
+          f"{con['pools']['observadas_votos']:,} votos en disputa (JEE)"
+          f"{'  ⚠ el líder cambia en el grid anulación×skew' if con['scenarios']['flips_within_grid'] else ''}")
     b = proj["bounds"]
     print(f"  COTAS Manski  [{b['margin_votes'][0]:+,}, {b['margin_votes'][1]:+,}]  "
           f"{'(cruzan 0 → abierto)' if b['straddles_zero'] else '(no cruzan 0)'}")

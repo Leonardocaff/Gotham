@@ -1,9 +1,9 @@
 {
-  "generatedAt": "2026-06-10T00:47:14.894523+00:00",
+  "generatedAt": "2026-06-10T00:58:09.779569+00:00",
   "source": {
     "idEleccion": 10,
     "portal": "resultadosegundavuelta.onpe.gob.pe",
-    "fechaActualizacion": 1781052120079
+    "fechaActualizacion": 1781052720258
   },
   "count": {
     "actasContabilizadasPct": 96.412,
@@ -41,40 +41,41 @@
   "projection": {
     "leader": "keiko",
     "p_win": {
-      "sanchez": 0.0599,
-      "keiko": 0.9401
+      "sanchez": 0.1065,
+      "keiko": 0.8935
     },
     "final_pct": {
       "sanchez": {
         "median": 49.897,
         "ci90": [
-          49.787,
-          50.006
+          49.76,
+          50.033
         ]
       },
       "keiko": {
         "median": 50.103,
         "ci90": [
-          49.994,
-          50.213
+          49.967,
+          50.24
         ]
       }
     },
     "final_margin": {
       "median_votes": -38058,
       "ci90_votes": [
-        -78292,
-        2177
+        -88319,
+        12204
       ],
       "median_pct": -0.207,
       "ci90_pct": [
-        -0.425,
-        0.012
+        -0.48,
+        0.066
       ]
     },
     "sd_components": {
       "muestreo_votos": 8882,
-      "deriva_votos": 8408
+      "deriva_votos": 8408,
+      "impugnadas_votos": 9157
     },
     "bounds": {
       "margin_votes": [
@@ -90,67 +91,67 @@
     "sensitivity": [
       {
         "delta_pp": -3.0,
-        "p_win_sanchez": 0.0017,
+        "p_win_sanchez": 0.0095,
         "margin_votes": -71689,
         "leader": "keiko"
       },
       {
         "delta_pp": -2.0,
-        "p_win_sanchez": 0.0067,
+        "p_win_sanchez": 0.0239,
         "margin_votes": -60478,
         "leader": "keiko"
       },
       {
         "delta_pp": -1.5,
-        "p_win_sanchez": 0.0124,
+        "p_win_sanchez": 0.0363,
         "margin_votes": -54873,
         "leader": "keiko"
       },
       {
         "delta_pp": -1.0,
-        "p_win_sanchez": 0.022,
+        "p_win_sanchez": 0.0534,
         "margin_votes": -49268,
         "leader": "keiko"
       },
       {
         "delta_pp": -0.5,
-        "p_win_sanchez": 0.0371,
+        "p_win_sanchez": 0.0765,
         "margin_votes": -43663,
         "leader": "keiko"
       },
       {
         "delta_pp": 0.0,
-        "p_win_sanchez": 0.0599,
+        "p_win_sanchez": 0.1065,
         "margin_votes": -38058,
         "leader": "keiko"
       },
       {
         "delta_pp": 0.5,
-        "p_win_sanchez": 0.0923,
+        "p_win_sanchez": 0.1441,
         "margin_votes": -32453,
         "leader": "keiko"
       },
       {
         "delta_pp": 1.0,
-        "p_win_sanchez": 0.1362,
+        "p_win_sanchez": 0.1898,
         "margin_votes": -26847,
         "leader": "keiko"
       },
       {
         "delta_pp": 1.5,
-        "p_win_sanchez": 0.1926,
+        "p_win_sanchez": 0.2435,
         "margin_votes": -21242,
         "leader": "keiko"
       },
       {
         "delta_pp": 2.0,
-        "p_win_sanchez": 0.2613,
+        "p_win_sanchez": 0.3044,
         "margin_votes": -15637,
         "leader": "keiko"
       },
       {
         "delta_pp": 3.0,
-        "p_win_sanchez": 0.4282,
+        "p_win_sanchez": 0.4424,
         "margin_votes": -4427,
         "leader": "keiko"
       }
@@ -164,6 +165,130 @@
       "pctSanchez": 35.38,
       "remainingVotesEst": 225947,
       "leanKeikoNetEst": 66080
+    },
+    "contested": {
+      "pools": {
+        "observadas_votos": 305224,
+        "observadas_actas": 1544,
+        "domestico": {
+          "observadas_votos": 299582,
+          "pendientes_votos": 33287,
+          "actas_observadas": 1494
+        },
+        "exterior": {
+          "observadas_votos": 5642,
+          "pendientes_votos": 182583,
+          "actas_observadas": 50
+        }
+      },
+      "scenarios": {
+        "annul_rates": [
+          0.0,
+          0.05,
+          0.1,
+          0.2
+        ],
+        "skews_pp": [
+          -5.0,
+          0.0,
+          5.0
+        ],
+        "grid": [
+          [
+            {
+              "annul": 0.0,
+              "skew_pp": -5.0,
+              "margin": -68580,
+              "leader": "keiko"
+            },
+            {
+              "annul": 0.0,
+              "skew_pp": 0.0,
+              "margin": -38058,
+              "leader": "keiko"
+            },
+            {
+              "annul": 0.0,
+              "skew_pp": 5.0,
+              "margin": -7535,
+              "leader": "keiko"
+            }
+          ],
+          [
+            {
+              "annul": 0.05,
+              "skew_pp": -5.0,
+              "margin": -67031,
+              "leader": "keiko"
+            },
+            {
+              "annul": 0.05,
+              "skew_pp": 0.0,
+              "margin": -38034,
+              "leader": "keiko"
+            },
+            {
+              "annul": 0.05,
+              "skew_pp": 5.0,
+              "margin": -9038,
+              "leader": "keiko"
+            }
+          ],
+          [
+            {
+              "annul": 0.1,
+              "skew_pp": -5.0,
+              "margin": -65481,
+              "leader": "keiko"
+            },
+            {
+              "annul": 0.1,
+              "skew_pp": 0.0,
+              "margin": -38011,
+              "leader": "keiko"
+            },
+            {
+              "annul": 0.1,
+              "skew_pp": 5.0,
+              "margin": -10541,
+              "leader": "keiko"
+            }
+          ],
+          [
+            {
+              "annul": 0.2,
+              "skew_pp": -5.0,
+              "margin": -62383,
+              "leader": "keiko"
+            },
+            {
+              "annul": 0.2,
+              "skew_pp": 0.0,
+              "margin": -37965,
+              "leader": "keiko"
+            },
+            {
+              "annul": 0.2,
+              "skew_pp": 5.0,
+              "margin": -13547,
+              "leader": "keiko"
+            }
+          ]
+        ],
+        "flips_within_grid": false
+      },
+      "bounds_con_anulacion": {
+        "margin_votes": [
+          -824325,
+          601929
+        ],
+        "margin_pct": [
+          -4.48,
+          3.27
+        ],
+        "straddles_zero": true
+      },
+      "nota_legal": "El conteo ONPE no es la proclamación del JNE. Los pedidos de NULIDAD ante el JNE (capa legal adversarial post-conteo) pueden anular o reasignar actas semanas después y NO están en esta proyección estadística."
     },
     "decision": "INDECIDIBLE",
     "decision_reason": "El exterior está 60% contado (pool grande, pro-Keiko) y el margen proyectado es 0.21pp: pivota en data que aún no existe."
@@ -188,14 +313,14 @@
       "label": "Forma cerrada (P, IC)",
       "leader": "keiko",
       "p_win": {
-        "sanchez": 0.0599,
-        "keiko": 0.9401
+        "sanchez": 0.1065,
+        "keiko": 0.8935
       },
       "final_pct_sanchez": 49.897,
       "final_margin_votes": -38058,
       "ci90_margin_votes": [
-        -78292,
-        2177
+        -88319,
+        12204
       ]
     },
     {
@@ -203,10 +328,10 @@
       "label": "Monte Carlo (verificación)",
       "leader": "keiko",
       "p_win": {
-        "sanchez": 0.0595,
-        "keiko": 0.9405
+        "sanchez": 0.1045,
+        "keiko": 0.8955
       },
-      "final_margin_votes": -37961
+      "final_margin_votes": -38300
     }
   ],
   "strata": [

@@ -34,6 +34,8 @@ from .stratified import stratum_remaining_votes
 
 SIGMA_DELTA = 0.015   # σ de la deriva sistémica (1.5pp); anclado en el corrimiento de
                       # cuenta tardía 2021. La sensibilidad se reporta para todo el rango.
+SIGMA_SKEW = 0.03     # σ de la incertidumbre direccional del pool de actas observadas
+                      # (no conocemos su geografía exacta ⇒ ±3pp de skew en su split).
 
 
 def _arrays(snap: Snapshot):
@@ -52,7 +54,9 @@ def closed_form(snap: Snapshot, delta_mean: float = 0.0, sigma_delta: float = SI
     mu_rem = float(np.sum(m * p)) + M * delta_mean
     var_samp = float(np.sum(m ** 2 * p * (1 - p) / n))          # muestreo (data)
     var_delta = (M ** 2) * (sigma_delta ** 2)                   # deriva sistémica (supuesto)
-    sd_rem = float(np.sqrt(var_samp + var_delta))
+    O = float(snap.contested_votes)                             # votos en actas observadas
+    var_contested = (O ** 2) * (SIGMA_SKEW ** 2)                # incertidumbre direccional del pool en disputa
+    sd_rem = float(np.sqrt(var_samp + var_delta + var_contested))
 
     final_s_mean = counted_s + mu_rem
     total = counted_total + M
@@ -81,6 +85,7 @@ def closed_form(snap: Snapshot, delta_mean: float = 0.0, sigma_delta: float = SI
         "sd_components": {
             "muestreo_votos": float(np.sqrt(var_samp)),
             "deriva_votos": float(np.sqrt(var_delta)),
+            "impugnadas_votos": float(np.sqrt(var_contested)),
         },
         "leader": "sanchez" if margin_mean >= 0 else "keiko",
     }
@@ -126,7 +131,9 @@ def montecarlo_check(snap: Snapshot, n_sims: int = 50_000,
     delta = rng.normal(0.0, sigma_delta, size=(n_sims, 1))
     q = np.clip(q + delta, 0.0, 1.0)
     sanchez_rem = q @ m                                                   # (N,)
-    final_s = snap.votos_sanchez + sanchez_rem
+    # incertidumbre direccional del pool de actas observadas (consistente con closed_form)
+    contested = rng.normal(0.0, float(snap.contested_votes) * SIGMA_SKEW, size=n_sims)
+    final_s = snap.votos_sanchez + sanchez_rem + contested
     total = snap.votos_sanchez + snap.votos_keiko + float(m.sum())
     margin = 2 * final_s - total
     p_win = float(np.mean(margin > 0))

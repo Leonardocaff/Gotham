@@ -9,7 +9,7 @@ rango plausible, dice INDECIDIBLE.
 from __future__ import annotations
 
 from ..snapshot import Snapshot
-from . import inference, stratified
+from . import contested, inference, stratified
 
 
 def _exterior(snap: Snapshot) -> dict:
@@ -57,13 +57,19 @@ def evaluate(snap: Snapshot) -> dict:
     sens = inference.sensitivity(snap)
     mc = inference.montecarlo_check(snap)
     ext = _exterior(snap)
+    # capa de actas impugnadas/observadas
+    base_margin = strat["final_margin_votes"]
+    R = stratified.total_remaining(snap)
+    contested_pools = contested.pools(snap)
+    contested_scen = contested.scenarios(snap, base_margin)
+    bounds_annul = contested.manski_with_annulment(snap, R)
 
     leader = cf["leader"]
     p_win_leader = cf["p_win"][leader]
     margin_pct_abs = abs(cf["final_margin_pct"]["median"])
     decision, reason = _decision(p_win_leader, cf["final_margin_votes"]["ci90"],
-                                 bounds["straddles_zero"], ext["actasPct"],
-                                 margin_pct_abs, sens)
+                                 bounds["straddles_zero"] or contested_scen["flips_within_grid"],
+                                 ext["actasPct"], margin_pct_abs, sens)
 
     methods = [
         {"key": "naive", "label": naive["label"], "leader": naive["leader"],
@@ -105,6 +111,15 @@ def evaluate(snap: Snapshot) -> dict:
                    "straddles_zero": bounds["straddles_zero"]},
         "sensitivity": sens,
         "exterior": ext,
+        "contested": {
+            "pools": contested_pools,
+            "scenarios": contested_scen,
+            "bounds_con_anulacion": bounds_annul,
+            "nota_legal": (
+                "El conteo ONPE no es la proclamación del JNE. Los pedidos de NULIDAD ante "
+                "el JNE (capa legal adversarial post-conteo) pueden anular o reasignar actas "
+                "semanas después y NO están en esta proyección estadística."),
+        },
         "decision": decision,
         "decision_reason": reason,
         "models": methods,

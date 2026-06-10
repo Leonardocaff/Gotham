@@ -64,6 +64,24 @@ estrato + δ), que coincide dentro de <1pp.
    dirección). `σ_δ = 1.5pp`, anclado en el corrimiento de cuenta tardía de 2021.
    Contribución: `(Σ m_s)² · σ_δ²`.
 
+## 4b. Actas impugnadas / observadas (JEE) y anulación
+
+El restante NO es homogéneo. ONPE expone por ámbito cuántas actas están **observadas** (en
+el JEE, con error material/firmas/votos que no cuadran → riesgo de anulación) vs solo
+**pendientes** (lentas). Hoy ~90% del restante doméstico son observadas (~300k votos en
+disputa); el exterior es casi todo pendiente.
+
+- La proyección base cuenta las observadas con el split de su zona.
+- **Anulación**: una fracción se anula (votos eliminados) — direccional, perjudica al líder
+  local de esas actas. (JNE históricamente anula <3%; los partidos piden nulidad selectiva.)
+- **Skew**: sin data per-estrato de las observadas, su dirección es incierta (±3pp).
+
+Tratamiento: (i) la incertidumbre direccional del pool observado entra en la forma cerrada
+como término `(O·σ_skew)²` — hoy es la MAYOR fuente de varianza; (ii) se reporta un grid de
+escenarios (anulación × skew); (iii) las cotas de Manski se extienden para incluir anulación
+total del pool observado. La capa **legal del JNE** (pedidos de nulidad post-conteo) es
+adversarial, no estadística: queda como bandera cualitativa fuera del modelo.
+
 ## 5. Lo que es posible: cotas de Manski
 
 Sin ningún supuesto sobre el remanente: todo a Sánchez (`margen + M`) o todo a Keiko
