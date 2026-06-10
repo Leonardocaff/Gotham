@@ -36,7 +36,7 @@ export function Methods({ latest }: { latest: Latest }) {
                     </span>
                   </td>
                   <td className="py-2 pr-3 text-right text-ink-1">
-                    {pct(m.final_pct_sanchez, 2)}
+                    {m.final_pct_sanchez != null ? pct(m.final_pct_sanchez, 2) : "—"}
                   </td>
                   <td
                     className="py-2 pr-3 text-right"

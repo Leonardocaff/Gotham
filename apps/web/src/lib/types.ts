@@ -124,7 +124,7 @@ export interface ModelResult {
   key: string;
   label: string;
   leader: CandidateKey;
-  final_pct_sanchez: number;
+  final_pct_sanchez?: number;
   final_margin_votes: number;
   final_margin_pct?: number;
   p_win?: Record<CandidateKey, number>;

@@ -106,6 +106,7 @@ export default function Globe({
   const spinRef = useRef<number | null>(null);
   const [ready, setReady] = useState(false);
   const [polyReady, setPolyReady] = useState(false);
+  const [failed, setFailed] = useState(false);
   const strataRef = useRef(strata);
   const continentsRef = useRef(continents);
   const onSelectRef = useRef(onSelect);
@@ -118,16 +119,25 @@ export default function Globe({
     if (!TOKEN || !containerRef.current || mapRef.current) return;
     mapboxgl.accessToken = TOKEN;
 
-    const map = new mapboxgl.Map({
-      container: containerRef.current,
-      style: "mapbox://styles/mapbox/dark-v11",
-      projection: { name: "globe" },
-      center: PERU_CENTER,
-      zoom: 2.4,
-      pitch: 0,
-      attributionControl: false,
-      antialias: true,
-    });
+    let map: mapboxgl.Map;
+    try {
+      map = new mapboxgl.Map({
+        container: containerRef.current,
+        style: "mapbox://styles/mapbox/dark-v11",
+        projection: { name: "globe" },
+        center: PERU_CENTER,
+        zoom: 2.4,
+        pitch: 0,
+        attributionControl: false,
+        antialias: true,
+      });
+    } catch (e) {
+      // p.ej. WebGL no disponible/deshabilitado — degradar sin romper la app
+      console.warn("Globe: Mapbox init falló", e);
+      setFailed(true);
+      return;
+    }
+    map.on("error", (ev) => console.warn("Globe: Mapbox error", ev?.error));
     mapRef.current = map;
 
     const stopSpin = () => {
@@ -462,6 +472,22 @@ export default function Globe({
               .env.local
             </code>{" "}
             y recarga para activar el globo interactivo de Mapbox.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  if (failed) {
+    return (
+      <div className="relative flex h-full min-h-[420px] w-full items-center justify-center overflow-hidden rounded-2xl border border-edge bg-surface-1 px-6 text-center">
+        <div>
+          <h3 className="font-display text-sm uppercase tracking-[0.2em] text-ink-1">
+            Globo no disponible
+          </h3>
+          <p className="mt-2 text-xs leading-relaxed text-ink-3">
+            Tu navegador no pudo inicializar WebGL. El resto del análisis sigue activo;
+            usa el ranking de departamentos abajo.
           </p>
         </div>
       </div>

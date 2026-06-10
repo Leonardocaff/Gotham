@@ -87,6 +87,9 @@ def evaluate(snap: Snapshot) -> dict:
          "sanchez" if mc["p_win_sanchez"] >= 0.5 else "keiko",
          "p_win": {"sanchez": round(mc["p_win_sanchez"], 4),
                    "keiko": round(1 - mc["p_win_sanchez"], 4)},
+         "final_pct_sanchez": round(
+             100.0 * ((mc["margin_median"] + cf["final_votes"]["total"]) / 2.0)
+             / cf["final_votes"]["total"], 3),
          "final_margin_votes": round(mc["margin_median"])},
     ]
 
