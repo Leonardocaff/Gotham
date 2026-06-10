@@ -27,7 +27,7 @@ const TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN ?? "";
 // planet (a full longitude spin would carry Peru out of view, defeating the
 // zoom). A whisper-slow drift gently re-settles the camera on Peru until the
 // user takes over with drag / pinch.
-const INITIAL_ZOOM = 3.5;
+const INITIAL_ZOOM = 4.5;
 
 // A department is "contested" when its split is within this band of 50/50. Its
 // centroid gets a pulsing halo so toss-ups stand out on the planet.
@@ -489,7 +489,7 @@ export default function Globe({
         const c = deptCentroid(s.name);
         if (c) {
           lastFlownRef.current = code;
-          map.easeTo({ center: c, zoom: 4.6, duration: 800 });
+          map.easeTo({ center: c, zoom: 5.4, duration: 800 });
         }
         if (map.getLayer("depts-sel")) {
           map.setFilter("depts-sel", ["==", ["get", "g_code"], code]);
@@ -604,7 +604,7 @@ export default function Globe({
     lastFlownRef.current = code;
     interactedRef.current = true;
     const c = deptCentroid(selection.data.name);
-    if (c) map.easeTo({ center: c, zoom: 4.6, duration: 800 });
+    if (c) map.easeTo({ center: c, zoom: 5.4, duration: 800 });
     if (map.getLayer("depts-sel")) {
       map.setFilter("depts-sel", ["==", ["get", "g_code"], code]);
     }
