@@ -1,7 +1,7 @@
 "use client";
 
 import type { Latest } from "@/lib/types";
-import { CANDIDATE_COLOR } from "@/lib/types";
+import { CANDIDATE_COLOR, CANDIDATE_SHORT } from "@/lib/types";
 import { int, pct } from "@/lib/format";
 import { Panel } from "@/components/ui/Panel";
 import { Stat } from "@/components/ui/atoms";
@@ -13,18 +13,20 @@ export function Exterior({ latest }: { latest: Latest }) {
   );
   const maxRemain = Math.max(1, ...continents.map((c) => c.remainingVotesEst));
   const keikoPct = 100 - ext.pctSanchez;
+  const extLeader = ext.pctSanchez >= 50 ? "sanchez" : "keiko";
+  const leadColor = CANDIDATE_COLOR[extLeader];
 
   return (
     <Panel
       title="Voto en el exterior"
-      hint="Pool grande, pro-Keiko y aún incompleto — pivote de la elección"
+      hint={`Pool grande (${pct(ext.pctSanchez, 0)} Sánchez), pro-${CANDIDATE_SHORT[extLeader]} y aún incompleto — pivote de la elección`}
       aside={
         <span
           className="rounded-md border px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide"
           style={{
-            color: CANDIDATE_COLOR.keiko,
-            borderColor: `${CANDIDATE_COLOR.keiko}55`,
-            background: `${CANDIDATE_COLOR.keiko}14`,
+            color: leadColor,
+            borderColor: `${leadColor}55`,
+            background: `${leadColor}14`,
           }}
         >
           pivotal

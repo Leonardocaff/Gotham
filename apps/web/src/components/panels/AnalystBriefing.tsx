@@ -2,13 +2,25 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { Latest } from "@/lib/types";
+import { CANDIDATE_SHORT } from "@/lib/types";
 
-const SUGGESTIONS = [
-  "¿Por qué Keiko es favorita si Sánchez lidera el conteo?",
-  "¿Qué necesita exactamente Sánchez para ganar?",
-  "¿Qué papel juega el voto del exterior?",
-  "¿Qué riesgo representan las actas impugnadas?",
-];
+/** Preguntas sugeridas derivadas del estado: nombran al líder/segundo reales, no
+ * un candidato hardcodeado, para no quedar desactualizadas si la elección se mueve. */
+function suggestionsFor(latest: Latest): string[] {
+  const projLeader = latest.projection.leader;
+  const trailer = projLeader === "sanchez" ? "keiko" : "sanchez";
+  const countLeader = latest.currentMargin.leader;
+  const first =
+    projLeader === countLeader
+      ? `¿Qué tan sólida es la ventaja de ${CANDIDATE_SHORT[projLeader]}?`
+      : `¿Por qué ${CANDIDATE_SHORT[projLeader]} es favorito si ${CANDIDATE_SHORT[countLeader]} lidera el conteo?`;
+  return [
+    first,
+    `¿Qué necesita exactamente ${CANDIDATE_SHORT[trailer]} para ganar?`,
+    "¿Qué papel juega el voto del exterior?",
+    "¿Qué riesgo representan las actas impugnadas?",
+  ];
+}
 
 async function streamAnalyst(
   body: object,
@@ -41,6 +53,7 @@ async function streamAnalyst(
 }
 
 export function AnalystBriefing({ latest }: { latest: Latest }) {
+  const SUGGESTIONS = suggestionsFor(latest);
   const [brief, setBrief] = useState("");
   const [briefing, setBriefing] = useState(true);
   const [question, setQuestion] = useState("");

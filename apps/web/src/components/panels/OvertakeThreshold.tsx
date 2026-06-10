@@ -12,7 +12,7 @@ import {
   YAxis,
 } from "recharts";
 import type { Latest } from "@/lib/types";
-import { CANDIDATE_COLOR } from "@/lib/types";
+import { CANDIDATE_COLOR, CANDIDATE_SHORT } from "@/lib/types";
 import { Panel } from "@/components/ui/Panel";
 import { int } from "@/lib/format";
 
@@ -66,25 +66,31 @@ export function OvertakeThreshold({ latest }: { latest: Latest }) {
     };
   }, [p, latest.count.totalVotosValidos]);
 
-  const sanchezNeeds = m.qTiePct;
-  const sanchezGets = m.qProjPct;
-  const remonta = sanchezGets > sanchezNeeds;
+  // El que "remonta" es el que va ATRÁS en la proyección (no un candidato fijo).
+  const trailer = latest.projection.leader === "sanchez" ? "keiko" : "sanchez";
+  const trailerName = CANDIDATE_SHORT[trailer];
+  const trailerColor = CANDIDATE_COLOR[trailer];
+  // Cuota del restante que necesita / proyecta captar el rezagado (el eje es la
+  // cuota de Sánchez; Keiko = 100 − cuota de Sánchez).
+  const needs = trailer === "sanchez" ? m.qTiePct : 100 - m.qTiePct;
+  const gets = trailer === "sanchez" ? m.qProjPct : 100 - m.qProjPct;
+  const remonta = gets > needs;
 
   return (
     <Panel
       title="Umbral de remonte"
-      hint="% del voto restante que Sánchez necesita para alcanzar a Keiko"
+      hint={`% del voto restante que ${trailerName} necesita para dar vuelta el resultado`}
     >
       <p className="mb-2 text-[13px] leading-relaxed text-ink-1">
-        Sánchez{" "}
-        <span className="font-semibold" style={{ color: EMERALD }}>
-          remonta si capta ≥ {sanchezNeeds.toFixed(1)}%
+        {trailerName}{" "}
+        <span className="font-semibold" style={{ color: trailerColor }}>
+          remonta si capta ≥ {needs.toFixed(1)}%
         </span>{" "}
         del ~{int(m.R)} restante. El modelo proyecta que capta{" "}
-        <span className="font-semibold" style={{ color: remonta ? EMERALD : CYAN }}>
-          {sanchezGets.toFixed(1)}%
+        <span className="font-semibold" style={{ color: remonta ? EMERALD : trailerColor }}>
+          {gets.toFixed(1)}%
         </span>{" "}
-        → {remonta ? "alcanza" : "se queda corto por " + (sanchezNeeds - sanchezGets).toFixed(1) + "pp"}.
+        → {remonta ? "alcanza" : "se queda corto por " + (needs - gets).toFixed(1) + "pp"}.
       </p>
 
       <div className="h-44 w-full">
@@ -149,7 +155,7 @@ export function OvertakeThreshold({ latest }: { latest: Latest }) {
           x = cuota de Sánchez del restante · <span style={{ color: "#FFB43C" }}>línea</span> = umbral de empate
         </span>
         <span>
-          punto = proyectado ({sanchezGets.toFixed(1)}%)
+          punto = proyectado ({m.qProjPct.toFixed(1)}% Sánchez)
         </span>
       </div>
       <p className="mt-1 text-[10px] leading-snug text-ink-3">

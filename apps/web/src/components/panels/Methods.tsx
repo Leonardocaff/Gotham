@@ -1,16 +1,23 @@
 "use client";
 
 import type { Latest } from "@/lib/types";
-import { CANDIDATE_COLOR } from "@/lib/types";
+import { CANDIDATE_COLOR, CANDIDATE_SHORT } from "@/lib/types";
 import { pct, signedInt } from "@/lib/format";
 import { Panel } from "@/components/ui/Panel";
 
 export function Methods({ latest }: { latest: Latest }) {
+  const naive = latest.models.find((m) => m.key === "naive");
+  const rig =
+    latest.models.find((m) => m.key === "stratified") ??
+    latest.models.find((m) => m.key === "closed_form");
+  const hint =
+    naive && rig
+      ? naive.leader === rig.leader
+        ? `Naíve y rigurosos coinciden en ${CANDIDATE_SHORT[rig.leader]}`
+        : `El naíve favorece a ${CANDIDATE_SHORT[naive.leader]}; los rigurosos invierten a ${CANDIDATE_SHORT[rig.leader]}`
+      : "El naíve extrapola el % nacional; los rigurosos corrigen el sesgo de reporte diferencial";
   return (
-    <Panel
-      title="Métodos de proyección"
-      hint="El método naíve favorece a Sánchez; los métodos rigurosos invierten a Keiko"
-    >
+    <Panel title="Métodos de proyección" hint={hint}>
       <div className="-mx-1 overflow-x-auto px-1">
         <table className="w-full min-w-[420px] border-collapse text-left">
           <thead>
