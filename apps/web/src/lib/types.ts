@@ -194,6 +194,51 @@ export interface Forensics {
   disclaimer: string;
 }
 
+// ── Deep forensics (mesa-level) — public/data/forensics_deep.json ───────────
+
+export interface MesaImpossible {
+  checked: number;
+  count: number;
+  rate: number;
+  examples: {
+    codigoMesa: string;
+    dep: string;
+    electores: number;
+    emitidos: number | null;
+    validos: number | null;
+    reasons: string[];
+  }[];
+}
+
+export interface MesaParticipation {
+  n: number;
+  mean?: number;
+  median?: number;
+  pctOver95?: number;
+  countOver100?: number;
+  turnoutShareCorr?: number | null;
+  histogram?: { binWidth: number; counts: number[] };
+}
+
+export interface DeepForensics {
+  generatedAt: string;
+  level: "mesa";
+  meta: {
+    districtsSampled: number;
+    districtsTotal: number;
+    departmentsCovered: number;
+    actasListed: number;
+    mesasFetched: number;
+    seed: number;
+  };
+  signals: ForensicSignal[];
+  impossible: MesaImpossible;
+  participation: MesaParticipation;
+  estados: { estado: string; count: number; pct: number }[];
+  overall: { verdict: string; summary: string };
+  disclaimer: string;
+}
+
 export interface Latest {
   generatedAt: string;
   source: {

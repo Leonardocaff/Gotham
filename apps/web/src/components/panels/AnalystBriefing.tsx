@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import type { Latest } from "@/lib/types";
+import type { Latest, DeepForensics } from "@/lib/types";
 import { CANDIDATE_SHORT } from "@/lib/types";
 
 /** Preguntas sugeridas derivadas del estado: nombran al líder/segundo reales, no
@@ -52,7 +52,13 @@ async function streamAnalyst(
   }
 }
 
-export function AnalystBriefing({ latest }: { latest: Latest }) {
+export function AnalystBriefing({
+  latest,
+  deep,
+}: {
+  latest: Latest;
+  deep?: DeepForensics | null;
+}) {
   const SUGGESTIONS = suggestionsFor(latest);
   const [brief, setBrief] = useState("");
   const [briefing, setBriefing] = useState(true);
@@ -69,13 +75,13 @@ export function AnalystBriefing({ latest }: { latest: Latest }) {
     setBriefing(true);
     setBrief("");
     try {
-      await streamAnalyst({ mode: "brief", contract: latest }, setBrief, ctrl.signal);
+      await streamAnalyst({ mode: "brief", contract: latest, deep }, setBrief, ctrl.signal);
     } catch {
       /* aborted */
     } finally {
       if (briefAbort.current === ctrl) setBriefing(false);
     }
-  }, [latest]);
+  }, [latest, deep]);
 
   // Generate on mount + whenever the verdict or projected leader changes
   // (not on every 30s poll — that would burn tokens for no new signal).
@@ -99,7 +105,7 @@ export function AnalystBriefing({ latest }: { latest: Latest }) {
       setAnswer("");
       try {
         await streamAnalyst(
-          { mode: "ask", question: query, contract: latest },
+          { mode: "ask", question: query, contract: latest, deep },
           setAnswer,
           ctrl.signal,
         );
@@ -109,7 +115,7 @@ export function AnalystBriefing({ latest }: { latest: Latest }) {
         if (askAbort.current === ctrl) setAsking(false);
       }
     },
-    [latest],
+    [latest, deep],
   );
 
   return (

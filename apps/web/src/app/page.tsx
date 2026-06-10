@@ -4,6 +4,7 @@ import { useCallback, useState } from "react";
 import dynamic from "next/dynamic";
 import { useLiveData } from "@/lib/useLiveData";
 import { useHierarchy } from "@/lib/useHierarchy";
+import { useDeepForensics } from "@/lib/useDeepForensics";
 import type { GlobeSelection } from "@/components/globe/Globe";
 import { GeoExplorer, type GeoPath } from "@/components/globe/GeoExplorer";
 import { Verdict } from "@/components/panels/Verdict";
@@ -18,6 +19,7 @@ import { Sensitivity } from "@/components/panels/Sensitivity";
 import { OvertakeThreshold } from "@/components/panels/OvertakeThreshold";
 import { ManskiBounds } from "@/components/panels/ManskiBounds";
 import { ForensicIntegrity } from "@/components/panels/ForensicIntegrity";
+import { DeepForensics } from "@/components/panels/DeepForensics";
 import { Exterior } from "@/components/panels/Exterior";
 import { TimeSeries } from "@/components/panels/TimeSeries";
 import { Methodology } from "@/components/panels/Methodology";
@@ -39,6 +41,7 @@ const Globe = dynamic(() => import("@/components/globe/Globe"), {
 export default function Page() {
   const { latest, history, error, loading } = useLiveData();
   const hierarchy = useHierarchy();
+  const deepForensics = useDeepForensics();
 
   // `selection` drives the globe (fly + highlight). `geoPath` drives the
   // explorer (dep → prov → dist). Kept in sync: a globe click sets both; an
@@ -262,6 +265,7 @@ export default function Page() {
 
         {/* integridad / forense */}
         <ForensicIntegrity latest={latest} />
+        <DeepForensics data={deepForensics.data} />
 
         {/* geografía */}
         <Exterior latest={latest} />
@@ -269,7 +273,7 @@ export default function Page() {
         <TimeSeries history={history} />
 
         {/* IA + método */}
-        <AnalystBriefing latest={latest} />
+        <AnalystBriefing latest={latest} deep={deepForensics.data} />
         <Methodology latest={latest} />
 
         <p className="px-1 pt-1 text-center text-[10px] leading-snug text-ink-3">

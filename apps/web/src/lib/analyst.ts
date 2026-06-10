@@ -1,5 +1,5 @@
 // Server-side: builds the system prompt + compact data digest for the AI analyst.
-import type { Latest } from "./types";
+import type { Latest, DeepForensics } from "./types";
 
 const fmt = new Intl.NumberFormat("es-PE");
 const n = (x: number) => fmt.format(Math.round(x));
@@ -49,8 +49,19 @@ FORENSE (tamices de anomalía, NO prueba de fraude): VEREDICTO=${f.overall.verdi
 LIBRO DE INTEGRIDAD: ${n(l.totalActas)} actas totales · ${n(l.countedActas)} contabilizadas · ${n(l.observedActas)} observadas en JEE (~${n(l.observedVotesEst)} votos) · ${n(l.pendingActas)} pendientes. Pool en disputa ~${n(l.disputedVotesEst)} votos vs margen actual ${n(l.marginVotes)} — ${l.poolCanFlip ? `puede revertir (swing neto ${l.swingNeededFrac !== null ? (l.swingNeededFrac * 100).toFixed(1) + "%" : "—"} del pool)` : "no revierte aunque se anule entero"}.`;
 }
 
+/** Mesa-level deep-forensics block — only if the separate scan is loaded. */
+function deepForensicDigest(deep?: DeepForensics | null): string {
+  if (!deep) return "";
+  const sig = deep.signals
+    .map((s) => `${s.label}: ${s.verdict}${s.pvalue !== null ? ` (p=${s.pvalue < 0.001 ? "<0.001" : s.pvalue.toFixed(3)}, MAD=${s.mad ?? "—"})` : ""}`)
+    .join("; ");
+  const pa = deep.participation;
+  return `
+FORENSE PROFUNDO (nivel MESA, muestra de ${n(deep.meta.mesasFetched)} mesas en ${deep.meta.districtsSampled} distritos / ${deep.meta.departmentsCovered} deptos): VEREDICTO=${deep.overall.verdict}. Test válido a nivel mesa = ÚLTIMO DÍGITO (Beber-Scacco); NO se usa Benford a nivel mesa (conteos acotados → falsos positivos). ${sig}. Mesas con aritmética imposible: ${deep.impossible.count}/${deep.impossible.checked}. Participación media ${pa.mean ?? "—"}%, mesas >100%: ${pa.countOver100 ?? "—"}. Estados: ${deep.estados.map((e) => `${e.estado} ${e.pct}%`).join(", ")}.`;
+}
+
 /** Compact, token-efficient digest of the current contract state. */
-export function digest(d: Latest): string {
+export function digest(d: Latest, deep?: DeepForensics | null): string {
   const [s, k] = d.candidates;
   const p = d.projection;
   const fv = p.final_votes;
@@ -86,7 +97,7 @@ SENSIBILIDAD: ${sens}.
 ACTAS IMPUGNADAS (JEE): ${n(p.contested.pools.observadas_votos)} votos en ${p.contested.pools.observadas_actas} actas observadas (doméstico ${n(p.contested.pools.domestico.observadas_votos)}, exterior ${n(p.contested.pools.exterior.observadas_votos)}). ${p.contested.scenarios.flips_within_grid ? "El líder CAMBIA según anulación×skew." : "El líder es estable a la anulación."}
 
 EXTERIOR (pivotal): ${ext.actasPct.toFixed(1)}% contado · ${ext.pctSanchez.toFixed(1)}% Sánchez · ~${n(ext.remainingVotesEst)} votos por contar · efecto neto estimado ${n(ext.leanKeikoNetEst)} a Keiko. Por continente: ${d.exteriorByContinent.map((c) => `${c.name} ${c.pctSanchez.toFixed(0)}%S (${c.actasPct.toFixed(0)}%, ~${n(c.remainingVotesEst)} rest.)`).join("; ")}.
-${forensicDigest(d)}
+${forensicDigest(d)}${deepForensicDigest(deep)}
 
 MÉTODOS:
 ${methods}

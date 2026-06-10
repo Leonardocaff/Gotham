@@ -12,7 +12,7 @@ import os
 
 from curl_cffi import requests
 
-from .config import HIERARCHY_PATH, HISTORY_PATH, LATEST_PATH
+from .config import DEEP_FORENSICS_PATH, HIERARCHY_PATH, HISTORY_PATH, LATEST_PATH
 
 _API = "https://blob.vercel-storage.com/"
 _PREFIX = "gotham/"
@@ -56,6 +56,11 @@ def publish_all() -> tuple[str | None, str | None]:
 def publish_hierarchy() -> str | None:
     """Sube hierarchy.json a Blob (cache más largo: cambia despacio, es grande)."""
     return _put(HIERARCHY_PATH, "hierarchy.json", "application/json", max_age=60)
+
+
+def publish_deep_forensics() -> str | None:
+    """Sube forensics_deep.json a Blob (forense de mesa; corre en cadencia lenta)."""
+    return _put(DEEP_FORENSICS_PATH, "forensics_deep.json", "application/json", max_age=120)
 
 
 def is_enabled() -> bool:

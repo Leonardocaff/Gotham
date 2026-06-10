@@ -2,7 +2,7 @@
 // grounded in the current Gotham model state. Server-side (uses ANTHROPIC_API_KEY).
 import Anthropic from "@anthropic-ai/sdk";
 import { ANALYST_MODEL, SYSTEM_PROMPT, digest } from "@/lib/analyst";
-import type { Latest } from "@/lib/types";
+import type { Latest, DeepForensics } from "@/lib/types";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -12,6 +12,7 @@ interface Body {
   mode: "brief" | "ask";
   question?: string;
   contract: Latest;
+  deep?: DeepForensics | null;
 }
 
 export async function POST(req: Request) {
@@ -29,7 +30,7 @@ export async function POST(req: Request) {
     return new Response("Falta el contrato de datos.", { status: 400 });
   }
 
-  const state = digest(body.contract);
+  const state = digest(body.contract, body.deep);
   const userText =
     body.mode === "ask" && body.question?.trim()
       ? `ESTADO ACTUAL DEL MODELO:\n${state}\n\nPREGUNTA DEL ANALISTA: ${body.question.trim()}\n\nResponde en español, conciso (máx ~120 palabras), anclado en estos números. No declares un ganador si el veredicto es INDECIDIBLE.`

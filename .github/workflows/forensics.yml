@@ -1,0 +1,38 @@
+name: forensics-deep
+
+# Forense PROFUNDO a nivel mesa, en la NUBE. Separado del poll de 5 min porque es pesado:
+# muestrea ~11k mesas (clúster por distrito, PPS), trae el detalle de cada acta en paralelo
+# (~3 min) y publica forensics_deep.json a Vercel Blob. Cadencia lenta (cada 30 min): la
+# distribución de dígitos no cambia minuto a minuto.
+
+on:
+  schedule:
+    - cron: "*/30 * * * *"
+  workflow_dispatch:
+    inputs:
+      target_mesas:
+        description: "Mesas objetivo en la muestra"
+        default: "11000"
+
+concurrency:
+  group: forensics-deep
+  cancel-in-progress: false
+
+jobs:
+  deep:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: engine/requirements.txt
+      - name: Instalar dependencias
+        run: pip install -r engine/requirements.txt
+      - name: Barrido forense de mesa y publicar a Blob
+        working-directory: engine
+        env:
+          BLOB_READ_WRITE_TOKEN: ${{ secrets.BLOB_READ_WRITE_TOKEN }}
+        run: python -u -m gotham.deep_forensics "${{ github.event.inputs.target_mesas || 11000 }}" 28 || true
