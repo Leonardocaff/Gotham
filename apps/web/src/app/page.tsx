@@ -121,7 +121,7 @@ export default function Page() {
           desktop; a shorter hero on top on phones. The HUD + legend + geo
           drill float over this column.
           ════════════════════════════════════════════════════════════════ */}
-      <section className="relative h-[46vh] w-full shrink-0 lg:h-full lg:min-w-0 lg:flex-1">
+      <section className="relative h-[54vh] w-full shrink-0 lg:h-full lg:min-w-0 lg:flex-1">
         <div className="absolute inset-0">
           <Globe
             strata={latest.strata}
@@ -213,7 +213,7 @@ export default function Page() {
             below stay reachable. Keeps the dep→prov→dist drill intact. ── */}
         {geoOpen && (
           <div className="pointer-events-none absolute inset-0 z-40">
-            <div className="pointer-events-auto absolute inset-x-3 top-16 max-h-[calc(46vh-5rem)] overflow-y-auto sm:top-20 lg:inset-x-auto lg:right-4 lg:top-1/2 lg:max-h-[78vh] lg:w-[360px] lg:-translate-y-1/2">
+            <div className="pointer-events-auto absolute inset-x-3 top-16 max-h-[calc(54vh-5rem)] overflow-y-auto sm:top-20 lg:inset-x-auto lg:right-4 lg:top-1/2 lg:max-h-[78vh] lg:w-[360px] lg:-translate-y-1/2">
               <GeoExplorer
                 path={geoPath && geoPath.depCode ? geoPath : null}
                 hierarchy={hierarchy}

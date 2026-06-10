@@ -153,6 +153,12 @@ export default function Globe({
     if (!TOKEN || !containerRef.current || mapRef.current) return;
     mapboxgl.accessToken = TOKEN;
 
+    // Encuadre responsivo: en viewports angostos (celular vertical) el mismo zoom
+    // recorta Perú a los lados, así que reducimos un punto para que el país entre
+    // completo. En pantallas anchas usamos el zoom cerrado (~200%).
+    const vw = containerRef.current.clientWidth || window.innerWidth || 1024;
+    const initialZoom = vw < 640 ? INITIAL_ZOOM - 0.85 : vw < 1024 ? INITIAL_ZOOM - 0.35 : INITIAL_ZOOM;
+
     let map: mapboxgl.Map;
     try {
       map = new mapboxgl.Map({
@@ -162,7 +168,7 @@ export default function Globe({
         // Framed on Peru, zoomed in ~200% over the old 2.4 (each +1 doubles the
         // apparent scale). Peru fills the frame; the globe edge + space stay.
         center: PERU_CENTER,
-        zoom: INITIAL_ZOOM,
+        zoom: initialZoom,
         pitch: 0,
         attributionControl: false,
         antialias: true,
