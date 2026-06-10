@@ -217,6 +217,20 @@ export default function Globe({
         "space-color": "rgb(4,4,7)",
         "star-intensity": 0.7,
       });
+
+      // Limpieza Palantir: ocultar TODOS los labels base de Mapbox (nombres de
+      // país/ciudad/océano, etc.) para que solo lea nuestro choropleth. Nuestros
+      // propios labels (continentes) se añaden después, así que no se ocultan.
+      try {
+        for (const layer of map.getStyle()?.layers ?? []) {
+          if (layer.type === "symbol") {
+            map.setLayoutProperty(layer.id, "visibility", "none");
+          }
+        }
+      } catch {
+        /* estilos cambian entre versiones — no romper si falla */
+      }
+
       setReady(true);
 
       // No continuous spin — that would rotate Peru out of frame. Instead a
