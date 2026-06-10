@@ -299,7 +299,7 @@ export default function Page() {
         <Uncertainty latest={latest} />
         <ManskiBounds latest={latest} />
         <Sensitivity latest={latest} />
-        <Crossover history={history} />
+        <Crossover history={history} latest={latest} />
         <OvertakeThreshold latest={latest} />
         <ActasComposition latest={latest} />
 

@@ -11,93 +11,146 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import type { HistoryPoint } from "@/lib/types";
+import type { HistoryPoint, Latest } from "@/lib/types";
 import { CANDIDATE_COLOR } from "@/lib/types";
 import { Panel } from "@/components/ui/Panel";
 import { int } from "@/lib/format";
 
 const EMERALD = CANDIDATE_COLOR.sanchez;
 const CYAN = CANDIDATE_COLOR.keiko;
+const GOLD = "#FFB43C";
+
+const name = (k: "sanchez" | "keiko") => (k === "sanchez" ? "Sánchez" : "Keiko");
+const side = (v: number): "sanchez" | "keiko" => (v >= 0 ? "sanchez" : "keiko");
 
 /**
- * "Punto de cruce" — el margen Sánchez−Keiko (en votos) a lo largo del % de actas
- * contabilizadas. Las primeras actas (urbanas, rápidas) favorecieron a un candidato; al
- * entrar el voto rural y del exterior el margen se mueve y, en algún %, cruza cero: ahí
- * el liderazgo cambia de manos. Marcamos ese % exacto.
+ * "Punto de cruce" — el margen Sánchez−Keiko (votos) a lo largo del % de actas. La línea
+ * sólida es lo OBSERVADO; la punteada proyecta desde el conteo actual hasta el margen final
+ * del modelo (a 100%). Donde cruza el cero cambia el líder, y ahí marcamos el %.
  */
-export function Crossover({ history }: { history: HistoryPoint[] }) {
+export function Crossover({
+  history,
+  latest,
+}: {
+  history: HistoryPoint[];
+  latest: Latest;
+}) {
   const m = useMemo(() => {
     const pts = [...history]
       .filter((h) => Number.isFinite(h.actasPct) && Number.isFinite(h.marginVotes))
       .sort((a, b) => a.actasPct - b.actasPct);
     if (pts.length < 2) return null;
 
-    const data = pts.map((h) => ({
+    const last = pts[pts.length - 1];
+    const finalMargin = latest.projection.final_margin.median_votes; // +Sánchez, −Keiko, a 100%
+    const endActas = Math.max(last.actasPct, latest.count.actasContabilizadasPct, 99.999);
+
+    // serie observada + un tramo proyectado (último punto → 100%)
+    const data: {
+      actas: number;
+      obs?: number | null;
+      proj?: number | null;
+      pos: number;
+      neg: number;
+    }[] = pts.map((h) => ({
       actas: h.actasPct,
-      margin: h.marginVotes, // +Sánchez, −Keiko
+      obs: h.marginVotes,
+      proj: null,
       pos: h.marginVotes >= 0 ? h.marginVotes : 0,
       neg: h.marginVotes < 0 ? h.marginVotes : 0,
     }));
+    // puente: el último observado ancla la línea punteada
+    data[data.length - 1].proj = last.marginVotes;
+    data.push({
+      actas: 100,
+      obs: null,
+      proj: finalMargin,
+      pos: finalMargin >= 0 ? finalMargin : 0,
+      neg: finalMargin < 0 ? finalMargin : 0,
+    });
 
-    // Último cambio de signo del margen = el cruce de liderazgo más reciente.
-    let crossAt: number | null = null;
-    let from: "sanchez" | "keiko" | null = null;
-    let to: "sanchez" | "keiko" | null = null;
+    // ¿hubo cruce observado dentro del historial?
+    let obsCross: number | null = null;
+    let obsTo: "sanchez" | "keiko" | null = null;
     for (let i = 1; i < pts.length; i++) {
       const a = pts[i - 1].marginVotes;
       const b = pts[i].marginVotes;
       if (a === 0 || b === 0 || a * b < 0) {
         const t = a === b ? 0 : Math.abs(a) / (Math.abs(a) + Math.abs(b));
-        crossAt = pts[i - 1].actasPct + t * (pts[i].actasPct - pts[i - 1].actasPct);
-        from = a >= 0 ? "sanchez" : "keiko";
-        to = b >= 0 ? "sanchez" : "keiko";
+        obsCross = pts[i - 1].actasPct + t * (pts[i].actasPct - pts[i - 1].actasPct);
+        obsTo = side(b);
       }
     }
-    const now = pts[pts.length - 1];
-    const leaderNow: "sanchez" | "keiko" = now.marginVotes >= 0 ? "sanchez" : "keiko";
-    return { data, crossAt, from, to, leaderNow, nowMargin: now.marginVotes, nowActas: now.actasPct };
-  }, [history]);
+
+    // cruce PROYECTADO: el tramo punteado cambia de signo entre el actual y 100%
+    let projCross: number | null = null;
+    if (last.marginVotes * finalMargin < 0) {
+      const t = Math.abs(last.marginVotes) / (Math.abs(last.marginVotes) + Math.abs(finalMargin));
+      projCross = last.actasPct + t * (endActas - last.actasPct);
+    }
+
+    return {
+      data,
+      obsCross,
+      obsTo,
+      projCross,
+      leaderNow: side(last.marginVotes),
+      nowMargin: last.marginVotes,
+      nowActas: last.actasPct,
+      finalLeader: side(finalMargin),
+      finalMargin,
+      minA: Math.min(...pts.map((p) => p.actasPct)),
+    };
+  }, [history, latest]);
 
   if (!m) {
     return (
-      <Panel title="Punto de cruce" hint="Dónde cambió el liderazgo durante el conteo">
+      <Panel title="Punto de cruce" hint="Dónde cambia el líder a lo largo del conteo">
         <p className="text-[12px] leading-relaxed text-ink-3">
-          Aún no hay suficiente historial para trazar el cruce. Se llena conforme ONPE
-          publica nuevas actas.
+          Todavía falta historial para trazar el cruce. Se llena conforme ONPE publica
+          nuevas actas.
         </p>
       </Panel>
     );
   }
 
-  const name = (k: "sanchez" | "keiko") => (k === "sanchez" ? "Sánchez" : "Keiko");
-  const minA = Math.min(...m.data.map((d) => d.actas));
-  const maxA = Math.max(...m.data.map((d) => d.actas));
+  // crossover a mostrar: el observado tiene prioridad; si no, el proyectado.
+  const crossActas = m.obsCross ?? m.projCross;
+  const crossTo = m.obsCross ? m.obsTo : m.finalLeader;
+  const projected = m.obsCross == null && m.projCross != null;
 
   return (
     <Panel
       title="Punto de cruce"
-      hint="Margen (votos) según el % de actas contabilizadas — dónde el líder cambió de manos"
+      hint="Margen en votos a lo largo del conteo. Sólido = observado, punteado = proyectado al 100%."
     >
       <p className="mb-2 text-[13px] leading-relaxed text-ink-1">
-        {m.crossAt != null && m.from && m.to ? (
+        {m.obsCross != null && m.obsTo ? (
           <>
-            <span className="font-semibold" style={{ color: CANDIDATE_COLOR[m.to] }}>
-              {name(m.to)} superó a {name(m.from)}
+            <span className="font-semibold" style={{ color: CANDIDATE_COLOR[m.obsTo] }}>
+              {name(m.obsTo)} superó a {name(m.obsTo === "sanchez" ? "keiko" : "sanchez")}
             </span>{" "}
             al{" "}
-            <span className="tnum font-semibold" style={{ color: CANDIDATE_COLOR[m.to] }}>
-              {m.crossAt.toFixed(2)}%
+            <span className="tnum font-semibold" style={{ color: CANDIDATE_COLOR[m.obsTo] }}>
+              {m.obsCross.toFixed(2)}%
             </span>{" "}
-            del conteo. Hoy, con {m.nowActas.toFixed(2)}% contado, lidera{" "}
+            del conteo.
+          </>
+        ) : m.projCross != null && crossTo ? (
+          <>
+            El conteo crudo aún da{" "}
             <span className="font-semibold" style={{ color: CANDIDATE_COLOR[m.leaderNow] }}>
-              {name(m.leaderNow)}
+              {name(m.leaderNow)} +{int(Math.abs(m.nowMargin))}
+            </span>
+            , pero su ventaja cae rápido. Con el voto que falta (exterior pro-Keiko),{" "}
+            <span className="font-semibold" style={{ color: CANDIDATE_COLOR[crossTo] }}>
+              {name(crossTo)} lo supera al ~{m.projCross.toFixed(1)}%
             </span>{" "}
-            por {int(Math.abs(m.nowMargin))}.
+            del conteo.
           </>
         ) : (
           <>
-            En el rango observado ({minA.toFixed(1)}–{maxA.toFixed(1)}% actas) el liderazgo
-            no cambió de manos: mantiene la delantera{" "}
+            En lo contado, el liderazgo no cambia: lo mantiene{" "}
             <span className="font-semibold" style={{ color: CANDIDATE_COLOR[m.leaderNow] }}>
               {name(m.leaderNow)}
             </span>{" "}
@@ -108,7 +161,7 @@ export function Crossover({ history }: { history: HistoryPoint[] }) {
 
       <div className="h-44 w-full">
         <ResponsiveContainer width="100%" height="100%">
-          <ComposedChart data={m.data} margin={{ top: 6, right: 8, bottom: 2, left: -12 }}>
+          <ComposedChart data={m.data} margin={{ top: 6, right: 10, bottom: 2, left: -8 }}>
             <defs>
               <linearGradient id="cxS" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="0%" stopColor={EMERALD} stopOpacity={0.3} />
@@ -122,41 +175,67 @@ export function Crossover({ history }: { history: HistoryPoint[] }) {
             <XAxis
               dataKey="actas"
               type="number"
-              domain={[minA, maxA]}
+              domain={[Math.floor(m.minA), 100]}
+              ticks={[Math.floor(m.minA), Math.round((m.minA + 100) / 2), 100]}
               tickFormatter={(v: number) => `${v.toFixed(0)}%`}
               tick={{ fill: "#909092", fontSize: 10, fontFamily: "var(--font-jetbrains)" }}
               tickLine={false}
               axisLine={{ stroke: "rgba(255,255,255,0.08)" }}
             />
             <YAxis
-              tickFormatter={(v: number) => (Math.abs(v) >= 1000 ? `${(v / 1000).toFixed(0)}k` : `${v}`)}
+              tickFormatter={(v: number) =>
+                Math.abs(v) >= 1000 ? `${(v / 1000).toFixed(0)}k` : `${v}`
+              }
               tick={{ fill: "#909092", fontSize: 10, fontFamily: "var(--font-jetbrains)" }}
               tickLine={false}
               axisLine={false}
-              width={40}
+              width={38}
             />
             <Area dataKey="pos" stroke="none" fill="url(#cxS)" isAnimationActive={false} />
             <Area dataKey="neg" stroke="none" fill="url(#cxK)" isAnimationActive={false} />
             <ReferenceLine y={0} stroke="rgba(255,255,255,0.3)" strokeDasharray="3 3" />
-            <Line dataKey="margin" stroke="#F5F5F7" strokeWidth={2} dot={false} isAnimationActive={false} />
-            {m.crossAt != null && (
+            <Line
+              dataKey="obs"
+              stroke="#F5F5F7"
+              strokeWidth={2}
+              dot={false}
+              isAnimationActive={false}
+              connectNulls={false}
+            />
+            <Line
+              dataKey="proj"
+              stroke="#F5F5F7"
+              strokeWidth={2}
+              strokeDasharray="5 4"
+              strokeOpacity={0.65}
+              dot={false}
+              isAnimationActive={false}
+              connectNulls
+            />
+            {crossActas != null && (
               <ReferenceLine
-                x={m.crossAt}
-                stroke="#FFB43C"
+                x={crossActas}
+                stroke={GOLD}
                 strokeWidth={1.5}
-                label={{ value: `cruce ${m.crossAt.toFixed(1)}%`, fill: "#FFB43C", fontSize: 9, position: "insideTopRight" }}
+                label={{
+                  value: `${projected ? "≈" : ""}${crossActas.toFixed(1)}%`,
+                  fill: GOLD,
+                  fontSize: 9,
+                  position: "insideTopRight",
+                }}
               />
             )}
-            {m.crossAt != null && (
-              <ReferenceDot x={m.crossAt} y={0} r={4} fill="#FFB43C" stroke="#0A0A0C" strokeWidth={1.5} />
+            {crossActas != null && (
+              <ReferenceDot x={crossActas} y={0} r={4} fill={GOLD} stroke="#0A0A0C" strokeWidth={1.5} />
             )}
           </ComposedChart>
         </ResponsiveContainer>
       </div>
 
       <p className="mt-2 text-[10px] leading-snug text-ink-3">
-        Eje X = % de actas contabilizadas · eje Y = margen en votos (Sánchez − Keiko). Arriba
-        del cero lidera Sánchez (verde), abajo Keiko (cian); el cruce marca el cambio de líder.
+        Eje X = % de actas · eje Y = margen en votos (Sánchez − Keiko). Sobre el cero lidera
+        Sánchez (verde), bajo el cero Keiko (cian). La línea punteada es la trayectoria
+        proyectada hasta el 100%; el punto dorado marca el cambio de líder.
       </p>
     </Panel>
   );
