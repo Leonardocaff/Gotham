@@ -83,7 +83,7 @@ def _exterior_by_continent(snap: Snapshot) -> list[dict]:
     return out
 
 
-def build_contract(snap: Snapshot, result: dict) -> dict:
+def build_contract(snap: Snapshot, result: dict, forensic: dict | None = None) -> dict:
     margin_leader = snap.leader
     return {
         "generatedAt": datetime.now(timezone.utc).isoformat(),
@@ -120,6 +120,7 @@ def build_contract(snap: Snapshot, result: dict) -> dict:
         "models": result["models"],
         "strata": _departments(snap),
         "exteriorByContinent": _exterior_by_continent(snap),
+        "forensics": forensic,
         "caveat": CAVEAT,
     }
 

@@ -28,8 +28,9 @@ def _metrics(vs: float, vk: float, wpct: float, actas: float) -> dict:
     }
 
 
-def build(c: OnpeClient) -> dict:
-    districts = fetch_districts(c)
+def build(c: OnpeClient, districts: list[dict] | None = None) -> dict:
+    if districts is None:
+        districts = fetch_districts(c)
     names = fetch_ubigeo_names(c)
 
     def parts(code: str) -> list[str]:

@@ -8,8 +8,9 @@ from __future__ import annotations
 import sys
 
 from . import hierarchy as hier
+from .ingest import onpe
 from .ingest.client import OnpeClient, OnpeError
-from .models import ensemble
+from .models import ensemble, forensics
 from .publish import is_enabled, publish_all, publish_hierarchy
 from .snapshot import build_snapshot
 from .store import append_history, build_contract, write_hierarchy, write_latest
@@ -19,13 +20,17 @@ def run_once(verbose: bool = True) -> dict:
     c = OnpeClient()
     snap = build_snapshot(c)
     result = ensemble.evaluate(snap)
-    contract = build_contract(snap, result)
+    # distritos: sustrato del forense (Benford/último dígito) y de la jerarquía; se trae
+    # UNA vez y se reusa para no duplicar la llamada de 1,892 filas por ciclo.
+    districts = onpe.fetch_districts(c)
+    forensic = forensics.analyze(districts, snap)
+    contract = build_contract(snap, result, forensic)
     write_latest(contract)
     append_history(contract)
 
     # jerarquía geográfica viva (depto → provincia → distrito) para el drill profundo
     try:
-        h = hier.build(c)
+        h = hier.build(c, districts)
         write_hierarchy(h)
         if verbose:
             print(f"  ✓ jerarquía: {h['counts']['departments']} deptos · "

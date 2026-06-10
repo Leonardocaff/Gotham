@@ -17,6 +17,7 @@ import { ContestedGrid } from "@/components/panels/ContestedGrid";
 import { Sensitivity } from "@/components/panels/Sensitivity";
 import { OvertakeThreshold } from "@/components/panels/OvertakeThreshold";
 import { ManskiBounds } from "@/components/panels/ManskiBounds";
+import { ForensicIntegrity } from "@/components/panels/ForensicIntegrity";
 import { Exterior } from "@/components/panels/Exterior";
 import { TimeSeries } from "@/components/panels/TimeSeries";
 import { Methodology } from "@/components/panels/Methodology";
@@ -258,6 +259,9 @@ export default function Page() {
         <Sensitivity latest={latest} />
         <OvertakeThreshold latest={latest} />
         <ActasComposition latest={latest} />
+
+        {/* integridad / forense */}
+        <ForensicIntegrity latest={latest} />
 
         {/* geografía */}
         <Exterior latest={latest} />

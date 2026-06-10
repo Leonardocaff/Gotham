@@ -152,6 +152,48 @@ export interface ContinentStratum {
   remainingVotesEst: number;
 }
 
+// ── Forensics — anomaly screening, NOT a fraud accusation ───────────────────
+
+export type ForensicVerdict = "NORMAL" | "ATENCION" | "N/A";
+
+/** One digit-distribution test (Benford 2BL/1BL, last-digit). */
+export interface ForensicSignal {
+  key: string;
+  label: string;
+  verdict: ForensicVerdict;
+  n: number;
+  chi2?: number;
+  df?: number;
+  pvalue: number | null;
+  mad: number | null;
+  observed: number[];
+  expected: number[];
+  domain?: number[];
+  detail: string;
+  caveat: string;
+}
+
+/** Factual actas accounting — the answer to "900k actas" style rumors. */
+export interface ForensicLedger {
+  totalActas: number;
+  countedActas: number;
+  observedActas: number;
+  pendingActas: number;
+  observedVotesEst: number;
+  pendingVotesEst: number;
+  disputedVotesEst: number;
+  marginVotes: number;
+  poolCanFlip: boolean;
+  swingNeededFrac: number | null;
+}
+
+export interface Forensics {
+  signals: ForensicSignal[];
+  ledger: ForensicLedger;
+  overall: { verdict: string; summary: string };
+  disclaimer: string;
+}
+
 export interface Latest {
   generatedAt: string;
   source: {
@@ -170,6 +212,7 @@ export interface Latest {
   models: ModelResult[];
   strata: Stratum[];
   exteriorByContinent: ContinentStratum[];
+  forensics?: Forensics | null;
   caveat: string;
 }
 

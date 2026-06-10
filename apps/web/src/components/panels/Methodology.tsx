@@ -110,6 +110,25 @@ export function Methodology({ latest }: { latest: Latest }) {
           />
         </Section>
 
+        <Section title="Forense — tamiz de anomalías">
+          <p>
+            Sobre los ~1,892 distritos se corren tres tests de dígitos. Benford (1er y 2º
+            dígito) compara la frecuencia observada con la esperada{" "}
+            <Tex tex="P(d)=\log_{10}(1+1/d)" />; el último dígito se contrasta contra la
+            uniforme. El estadístico es <Tex tex="\chi^2" /> de bondad de ajuste:
+          </p>
+          <Tex
+            block
+            tex={"\\chi^2 = \\sum_{d}\\frac{(O_d - E_d)^2}{E_d},\\qquad E_d = N\\,P(d)"}
+          />
+          <p className="text-[11px] text-ink-3">
+            Un rechazo <strong className="text-ink-1">no prueba fraude</strong> — Benford
+            produce falsos positivos en datos electorales (Deckert et al. 2011). Es un tamiz
+            que señala dónde auditar, complementado por el libro de integridad de actas
+            (universo fijo de {int(latest.count.totalActas)} actas).
+          </p>
+        </Section>
+
         <Section title="Fuente de datos">
           <p>
             Backend en vivo de ONPE —{" "}

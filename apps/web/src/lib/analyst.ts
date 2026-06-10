@@ -22,10 +22,32 @@ CÓMO FUNCIONA EL MODELO (entiéndelo para interpretar bien — la DIRECCIÓN ac
 - VEREDICTO: DECIDIDO / INCLINADO / INDECIDIBLE. INDECIDIBLE no significa empate 50/50 — significa que pivota en data que aún no existe (exterior incompleto, actas en disputa).
 - CAVEAT clave: el conteo ONPE ≠ proclamación del JNE (semanas después); las actas en JEE pueden anularse o reasignarse. Es proyección estadística, no resultado oficial.
 
+FORENSE / FRAUDE (sé riguroso y desinflador de pánico):
+- Gotham corre tamices forenses sobre los datos publicados: Benford 2º dígito (2BL, el test preferido en forense electoral), Benford 1er dígito y uniformidad del último dígito, más un "libro de integridad" de actas. Te doy sus resultados en el ESTADO.
+- Un rechazo de Benford NO prueba fraude (falsos positivos conocidos en datos electorales, Deckert et al. 2011); es motivo de auditoría, no veredicto. Si los tests salen NORMAL, dilo claro: no hay evidencia estadística de manipulación.
+- Para rumores de cifras (p.ej. "900 mil actas"): ancla en el LIBRO DE INTEGRIDAD. El país tiene un universo FIJO de actas (~92,766). Cifras de cientos de miles/millones de "actas" no existen. Distingue actas observadas (JEE, capa legal normal) de fraude.
+- Separa SIEMPRE tres cosas: (a) errores/lentitud de conteo, (b) disputa legal de actas en el JEE, (c) manipulación. Solo (c) es "fraude" y no hay evidencia de ella en los dígitos.
+
 REGLAS:
 - Honestidad sobre la incertidumbre por encima de todo. No declares un ganador si el veredicto es INDECIDIBLE; explica POR QUÉ está reñido y QUÉ lo decidiría.
 - Para contrafácticos ("¿qué necesita X para ganar?"), usa la sensibilidad, el exterior y las cotas para dar condiciones concretas y cuantificadas.
 - Sé conciso. Responde directamente.`;
+
+/** Forensics block — only emitted if the contract carries it. */
+function forensicDigest(d: Latest): string {
+  const f = d.forensics;
+  if (!f) return "";
+  const sig = f.signals
+    .map(
+      (s) =>
+        `${s.label}: ${s.verdict}${s.pvalue !== null ? ` (p=${s.pvalue < 0.001 ? "<0.001" : s.pvalue.toFixed(3)}, MAD=${s.mad ?? "—"})` : ""}`,
+    )
+    .join("; ");
+  const l = f.ledger;
+  return `
+FORENSE (tamices de anomalía, NO prueba de fraude): VEREDICTO=${f.overall.verdict}. ${sig}.
+LIBRO DE INTEGRIDAD: ${n(l.totalActas)} actas totales · ${n(l.countedActas)} contabilizadas · ${n(l.observedActas)} observadas en JEE (~${n(l.observedVotesEst)} votos) · ${n(l.pendingActas)} pendientes. Pool en disputa ~${n(l.disputedVotesEst)} votos vs margen actual ${n(l.marginVotes)} — ${l.poolCanFlip ? `puede revertir (swing neto ${l.swingNeededFrac !== null ? (l.swingNeededFrac * 100).toFixed(1) + "%" : "—"} del pool)` : "no revierte aunque se anule entero"}.`;
+}
 
 /** Compact, token-efficient digest of the current contract state. */
 export function digest(d: Latest): string {
@@ -64,6 +86,7 @@ SENSIBILIDAD: ${sens}.
 ACTAS IMPUGNADAS (JEE): ${n(p.contested.pools.observadas_votos)} votos en ${p.contested.pools.observadas_actas} actas observadas (doméstico ${n(p.contested.pools.domestico.observadas_votos)}, exterior ${n(p.contested.pools.exterior.observadas_votos)}). ${p.contested.scenarios.flips_within_grid ? "El líder CAMBIA según anulación×skew." : "El líder es estable a la anulación."}
 
 EXTERIOR (pivotal): ${ext.actasPct.toFixed(1)}% contado · ${ext.pctSanchez.toFixed(1)}% Sánchez · ~${n(ext.remainingVotesEst)} votos por contar · efecto neto estimado ${n(ext.leanKeikoNetEst)} a Keiko. Por continente: ${d.exteriorByContinent.map((c) => `${c.name} ${c.pctSanchez.toFixed(0)}%S (${c.actasPct.toFixed(0)}%, ~${n(c.remainingVotesEst)} rest.)`).join("; ")}.
+${forensicDigest(d)}
 
 MÉTODOS:
 ${methods}
