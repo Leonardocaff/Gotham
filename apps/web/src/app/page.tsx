@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import dynamic from "next/dynamic";
 import { useLiveData } from "@/lib/useLiveData";
+import { useHierarchy } from "@/lib/useHierarchy";
 import type { GlobeSelection } from "@/components/globe/Globe";
-import { DrillDown } from "@/components/globe/DrillDown";
+import { GeoExplorer, type GeoPath } from "@/components/globe/GeoExplorer";
 import { Header } from "@/components/panels/Header";
 import { Verdict } from "@/components/panels/Verdict";
 import { FinalVotesHero, FinalVotesChip } from "@/components/panels/FinalVotesHero";
@@ -15,6 +16,7 @@ import { Methods } from "@/components/panels/Methods";
 import { ActasComposition } from "@/components/panels/ActasComposition";
 import { ContestedGrid } from "@/components/panels/ContestedGrid";
 import { Sensitivity } from "@/components/panels/Sensitivity";
+import { OvertakeThreshold } from "@/components/panels/OvertakeThreshold";
 import { ManskiBounds } from "@/components/panels/ManskiBounds";
 import { Exterior } from "@/components/panels/Exterior";
 import { TimeSeries } from "@/components/panels/TimeSeries";
@@ -52,7 +54,42 @@ function Float({
 
 export default function Page() {
   const { latest, history, error, loading } = useLiveData();
+  const hierarchy = useHierarchy();
+  // `selection` drives the globe (fly + highlight). `geoPath` drives the
+  // explorer panel (dep → prov → dist). They are kept in sync: a globe click
+  // sets both; an explorer drill sets geoPath and points selection at the
+  // PARENT department so the planet flies to / highlights it.
   const [selection, setSelection] = useState<GlobeSelection>(null);
+  const [geoPath, setGeoPath] = useState<GeoPath | null>(null);
+
+  // Globe → page. A dept selection opens the explorer at that department; a
+  // continent selection or null is handled but doesn't drive the geo explorer.
+  const onGlobeSelect = useCallback((sel: GlobeSelection) => {
+    setSelection(sel);
+    if (sel?.kind === "dept") setGeoPath({ depCode: sel.data.code });
+    else if (sel === null) setGeoPath(null);
+  }, []);
+
+  // Explorer → page. Drilling updates the path AND re-points the globe at the
+  // parent department (we only have department polygons). `latest` strata share
+  // their code with hierarchy departments, so the join is by code.
+  const onExplorerNavigate = useCallback(
+    (next: GeoPath | null) => {
+      setGeoPath(next);
+      if (!next) {
+        setSelection(null);
+        return;
+      }
+      const dep = latest?.strata.find((s) => s.code === next.depCode);
+      if (dep) setSelection({ kind: "dept", data: dep });
+    },
+    [latest],
+  );
+
+  const onExplorerClose = useCallback(() => {
+    setGeoPath(null);
+    setSelection(null);
+  }, []);
 
   if (loading && !latest) {
     return (
@@ -118,7 +155,7 @@ export default function Page() {
             strata={latest.strata}
             continents={latest.exteriorByContinent}
             selection={selection}
-            onSelect={setSelection}
+            onSelect={onGlobeSelect}
           />
 
           {/* HUD: live status / actas — top-left chip we always keep. */}
@@ -148,21 +185,40 @@ export default function Page() {
             <span className="flex items-center gap-1.5">
               <span className="h-2 w-2 rounded-full bg-accent-cyan" /> Keiko
             </span>
-            <span className="text-ink-3">intensidad = margen</span>
+            <span className="flex items-center gap-1.5">
+              <span className="h-2 w-2 rounded-full bg-accent-rose" /> reñido
+            </span>
           </div>
 
           {/* FinalVotes slim summary chip — bottom-centre, desktop only.
               Two projected totals + leader. Contained, lets the planet breathe.
-              The full detailed readout renders below the globe. */}
-          <div className="animate-fadeUp pointer-events-auto absolute bottom-3 left-1/2 z-30 hidden -translate-x-1/2 lg:block">
-            <FinalVotesChip latest={latest} />
-          </div>
+              The full detailed readout renders below the globe. Hidden while the
+              explorer is open so it never collides with the panel. */}
+          {!geoPath && (
+            <div className="animate-fadeUp pointer-events-auto absolute bottom-3 left-1/2 z-30 hidden -translate-x-1/2 lg:block">
+              <FinalVotesChip latest={latest} />
+            </div>
+          )}
 
-          {/* Drill-down: phones → bottom sheet; desktop → floats top-right,
-              pushed below the Verdict hero via the offset wrapper. */}
-          <div className="lg:[&>*]:!top-[240px]">
-            <DrillDown selection={selection} onClose={() => setSelection(null)} />
-          </div>
+          {/* GeoExplorer — only mounts once a department is chosen. Phones:
+              full-width bottom sheet. Desktop: floats over the globe on the
+              right, anchored to the stage bottom so it clears the Verdict HUD
+              and scrolls internally so tall drills (many provinces) never clip
+              against the stage. The panel carries the deep dep → prov → dist
+              drill with live cross-referenced data. */}
+          {geoPath && (
+            <div className="pointer-events-none">
+              <div className="pointer-events-auto fixed inset-x-3 bottom-3 z-40 max-h-[72vh] overflow-y-auto lg:absolute lg:inset-x-auto lg:bottom-4 lg:right-4 lg:top-auto lg:z-30 lg:max-h-[calc(68vh-220px)] lg:w-[330px] lg:overflow-y-auto">
+                <GeoExplorer
+                  path={geoPath}
+                  hierarchy={hierarchy}
+                  latest={latest}
+                  onNavigate={onExplorerNavigate}
+                  onClose={onExplorerClose}
+                />
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Mobile legend caption — replaces the floating legend HUD on phones. */}
@@ -226,6 +282,9 @@ export default function Page() {
         <Float delay={5}>
           <Sensitivity latest={latest} />
         </Float>
+        <Float delay={0} className="md:col-span-2 xl:col-span-1">
+          <OvertakeThreshold latest={latest} />
+        </Float>
         <Float delay={0}>
           <Exterior latest={latest} />
         </Float>
@@ -245,7 +304,7 @@ export default function Page() {
             selectedCode={
               selection?.kind === "dept" ? selection.data.code : undefined
             }
-            onSelect={(s) => setSelection({ kind: "dept", data: s })}
+            onSelect={(s) => onGlobeSelect({ kind: "dept", data: s })}
           />
         </Float>
       </div>

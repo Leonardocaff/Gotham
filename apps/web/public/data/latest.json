@@ -1,9 +1,9 @@
 {
-  "generatedAt": "2026-06-10T05:34:05.654226+00:00",
+  "generatedAt": "2026-06-10T05:51:30.706925+00:00",
   "source": {
     "idEleccion": 10,
     "portal": "resultadosegundavuelta.onpe.gob.pe",
-    "fechaActualizacion": 1781069520082
+    "fechaActualizacion": 1781070480179
   },
   "count": {
     "actasContabilizadasPct": 96.879,
@@ -345,11 +345,11 @@
       "label": "Monte Carlo (verificación)",
       "leader": "keiko",
       "p_win": {
-        "sanchez": 0.0454,
-        "keiko": 0.9546
+        "sanchez": 0.0447,
+        "keiko": 0.9553
       },
       "final_pct_sanchez": 49.885,
-      "final_margin_votes": -42367
+      "final_margin_votes": -42457
     }
   ],
   "strata": [

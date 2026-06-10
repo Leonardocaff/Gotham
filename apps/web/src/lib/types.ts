@@ -185,6 +185,78 @@ export interface HistoryPoint {
   decision: Decision;
 }
 
+// ── Geographic hierarchy contract — public/data/hierarchy.json ──────────────
+// Three flat arrays joined client-side by parent codes. `code` is a 6-digit
+// string; departments share their code with latest.json strata[].code.
+
+/** Department-level node. Carries region + rural for the explorer card. */
+export interface GeoDepartment {
+  code: string;
+  name: string;
+  region: string;
+  rural: boolean;
+  votos: Record<CandidateKey, number>;
+  pctSanchez: number;
+  leader: CandidateKey;
+  actasPct: number;
+  counted: number;
+  remainingEst: number;
+}
+
+/** Province node — parented to a department by `depCode`. */
+export interface GeoProvince {
+  code: string;
+  depCode: string;
+  name: string;
+  votos: Record<CandidateKey, number>;
+  pctSanchez: number;
+  leader: CandidateKey;
+  actasPct: number;
+  counted: number;
+  remainingEst: number;
+}
+
+/** District node — parented to a province by `provCode` (and `depCode`). */
+export interface GeoDistrict {
+  code: string;
+  provCode: string;
+  depCode: string;
+  name: string;
+  votos: Record<CandidateKey, number>;
+  pctSanchez: number;
+  leader: CandidateKey;
+  actasPct: number;
+  counted: number;
+  remainingEst: number;
+}
+
+/** A unit at any level the explorer can show. The shared fields are the ones
+ * the live card reads; level-specific extras (region/rural, parent codes) are
+ * optional so a single card renderer handles all three tiers. */
+export interface GeoNode {
+  level: "dep" | "prov" | "dist";
+  code: string;
+  name: string;
+  votos: Record<CandidateKey, number>;
+  pctSanchez: number;
+  leader: CandidateKey;
+  actasPct: number;
+  counted: number;
+  remainingEst: number;
+  depCode: string; // self code at dep level
+  provCode?: string;
+  region?: string;
+  rural?: boolean;
+}
+
+export interface Hierarchy {
+  generatedAt: string;
+  counts: { departments: number; provinces: number; districts: number };
+  departments: GeoDepartment[];
+  provinces: GeoProvince[];
+  districts: GeoDistrict[];
+}
+
 // ── Derived helpers shared by globe + panels ────────────────────────────────
 
 export function candidateByKey(

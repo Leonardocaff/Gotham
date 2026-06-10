@@ -22,6 +22,10 @@ import { leaderColor } from "@/lib/color";
 
 const TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN ?? "";
 
+// A department is "contested" when its split is within this band of 50/50. Its
+// centroid gets a pulsing halo so toss-ups stand out on the planet.
+const CONTESTED_BAND_PP = 6;
+
 export type GlobeSelection =
   | { kind: "dept"; data: Stratum }
   | { kind: "continent"; data: ContinentStratum }
@@ -70,6 +74,27 @@ function strataPoints(strata: Stratum[]): PointFC {
   return { type: "FeatureCollection", features };
 }
 
+/** Centroid points for the CONTESTED halo layer — only departments whose split
+ * is within CONTESTED_BAND_PP of even. These pulse to flag toss-ups. */
+function contestedPoints(strata: Stratum[]): PointFC {
+  const features = strata
+    .map((s): Feature<Point, Record<string, unknown>> | null => {
+      const marginPp = Math.abs(s.pctSanchez - (100 - s.pctSanchez));
+      if (marginPp >= CONTESTED_BAND_PP) return null;
+      const c = deptCentroid(s.name);
+      if (!c) return null;
+      // Tighter race → hotter glow. 0pp → 1.0, band edge → 0.
+      const heat = 1 - marginPp / CONTESTED_BAND_PP;
+      return {
+        type: "Feature",
+        properties: { name: s.name, code: s.code, heat },
+        geometry: { type: "Point", coordinates: c },
+      };
+    })
+    .filter((f): f is Feature<Point, Record<string, unknown>> => f !== null);
+  return { type: "FeatureCollection", features };
+}
+
 function continentPoints(continents: ContinentStratum[]): PointFC {
   const features = continents
     .map((c): Feature<Point, Record<string, unknown>> | null => {
@@ -104,6 +129,8 @@ export default function Globe({
   const mapRef = useRef<mapboxgl.Map | null>(null);
   const interactedRef = useRef(false);
   const spinRef = useRef<number | null>(null);
+  const pulseRef = useRef<number | null>(null);
+  const lastFlownRef = useRef<string | null>(null);
   const [ready, setReady] = useState(false);
   const [polyReady, setPolyReady] = useState(false);
   const [failed, setFailed] = useState(false);
@@ -199,6 +226,7 @@ export default function Globe({
       ro.disconnect();
       cancelAnimationFrame(raf);
       if (spinRef.current) cancelAnimationFrame(spinRef.current);
+      if (pulseRef.current) cancelAnimationFrame(pulseRef.current);
       map.remove();
       mapRef.current = null;
     };
@@ -271,6 +299,32 @@ export default function Globe({
           "text-color": "#B8B8BA",
           "text-halo-color": "#0A0A0C",
           "text-halo-width": 1.2,
+        },
+      });
+
+      // ── Contested glow source (toss-up departments) ───────────────────────
+      // Sits above the choropleth so the rose halo pulses over tight races.
+      map.addSource("contested", {
+        type: "geojson",
+        data: contestedPoints(strataRef.current),
+      });
+      map.addLayer({
+        id: "contested-glow",
+        type: "circle",
+        source: "contested",
+        paint: {
+          "circle-radius": [
+            "interpolate",
+            ["linear"],
+            ["get", "heat"],
+            0,
+            14,
+            1,
+            30,
+          ],
+          "circle-color": "#FF7A8A",
+          "circle-opacity": 0.18,
+          "circle-blur": 1,
         },
       });
 
@@ -397,7 +451,10 @@ export default function Globe({
         interactedRef.current = true;
         onSelectRef.current({ kind: "dept", data: s });
         const c = deptCentroid(s.name);
-        if (c) map.flyTo({ center: c, zoom: 4.6, duration: 1200 });
+        if (c) {
+          lastFlownRef.current = code;
+          map.easeTo({ center: c, zoom: 4.6, duration: 800 });
+        }
         if (map.getLayer("depts-sel")) {
           map.setFilter("depts-sel", ["==", ["get", "g_code"], code]);
         }
@@ -442,11 +499,37 @@ export default function Globe({
           map.getCanvas().style.cursor = "";
         });
       }
+
+      // ── Contested halo pulse loop ─────────────────────────────────────────
+      // Animate opacity (and a touch of radius) with a slow sine so toss-ups
+      // breathe. Honours reduced-motion: hold a steady mid glow instead.
+      const reduce =
+        typeof window !== "undefined" &&
+        window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+      if (!reduce) {
+        const t0 = performance.now();
+        const pulse = (now: number) => {
+          if (cancelled || !map.getLayer("contested-glow")) return;
+          const phase = (now - t0) / 1100; // ~2.2s full cycle
+          const wave = (Math.sin(phase) + 1) / 2; // 0..1
+          map.setPaintProperty(
+            "contested-glow",
+            "circle-opacity",
+            0.1 + wave * 0.22,
+          );
+          pulseRef.current = requestAnimationFrame(pulse);
+        };
+        pulseRef.current = requestAnimationFrame(pulse);
+      }
     }
 
     void addLayers();
     return () => {
       cancelled = true;
+      if (pulseRef.current) {
+        cancelAnimationFrame(pulseRef.current);
+        pulseRef.current = null;
+      }
     };
   }, [ready]);
 
@@ -458,16 +541,38 @@ export default function Globe({
     if (cSrc) cSrc.setData(continentPoints(continents));
     const pSrc = map.getSource("dept-pts") as GeoJSONSource | undefined;
     if (pSrc) pSrc.setData(strataPoints(strata));
+    const xSrc = map.getSource("contested") as GeoJSONSource | undefined;
+    if (xSrc) xSrc.setData(contestedPoints(strata));
   }, [strata, continents, ready, polyReady]);
 
-  // ── Reflect external selection clear (e.g. close button) ───────────────
+  // ── Two-way link: reflect external selection (panel drills) on the globe ──
+  // When the explorer changes the active department (province/district drill
+  // highlights the PARENT department), fly + highlight here. Guard re-flights
+  // so live polls don't re-trigger the camera.
   useEffect(() => {
     const map = mapRef.current;
     if (!map || !ready) return;
-    if (selection === null && map.getLayer("depts-sel")) {
-      map.setFilter("depts-sel", ["==", ["get", "g_code"], "__none__"]);
+
+    if (selection === null) {
+      lastFlownRef.current = null;
+      if (map.getLayer("depts-sel")) {
+        map.setFilter("depts-sel", ["==", ["get", "g_code"], "__none__"]);
+      }
+      return;
     }
-  }, [selection, ready]);
+
+    if (selection.kind !== "dept") return;
+    const code = selection.data.code;
+    if (lastFlownRef.current === code) return; // already centred here
+
+    lastFlownRef.current = code;
+    interactedRef.current = true;
+    const c = deptCentroid(selection.data.name);
+    if (c) map.easeTo({ center: c, zoom: 4.6, duration: 800 });
+    if (map.getLayer("depts-sel")) {
+      map.setFilter("depts-sel", ["==", ["get", "g_code"], code]);
+    }
+  }, [selection, ready, polyReady]);
 
   if (!TOKEN) {
     return (
