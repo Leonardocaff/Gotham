@@ -1,11 +1,12 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import type { Latest, CandidateKey } from "@/lib/types";
 import { CANDIDATE_COLOR } from "@/lib/types";
 import { int, pct, signedInt, signedPp } from "@/lib/format";
 import { useCountUp } from "@/lib/useCountUp";
 import { useChangeFlash } from "@/lib/useLiveData";
+import { CardModal, ExpandButton } from "@/components/ui/CardModal";
 
 const EMERALD = CANDIDATE_COLOR.sanchez;
 const CYAN = CANDIDATE_COLOR.keiko;
@@ -199,40 +200,24 @@ export function FinalVotesHero({ latest }: { latest: Latest }) {
   // to Sánchez in the contract; here we always present it from the leader's POV).
   const leadVotes = Math.abs(marginVotes);
 
-  return (
-    <section className="glass lift animate-fadeUp relative overflow-hidden p-5 sm:p-7">
-      {/* ambient leader glow */}
-      <div
-        className="pointer-events-none absolute -top-24 h-48 w-48 rounded-full opacity-30 blur-3xl"
-        style={{
-          left: projection.leader === "sanchez" ? "8%" : "auto",
-          right: projection.leader === "keiko" ? "8%" : "auto",
-          background: leaderColor,
-        }}
-      />
+  const [open, setOpen] = useState(false);
 
-      <header className="relative mb-4 flex flex-wrap items-center justify-between gap-3 sm:mb-5">
-        <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-          <h2 className="font-display text-sm font-semibold uppercase tracking-[0.16em] text-ink-1">
-            Proyección Final · Votos
-          </h2>
-          <span className="text-[10px] uppercase tracking-[0.14em] text-ink-3">
-            Totales absolutos proyectados · IC 90%
-          </span>
-        </div>
-        <span
-          className="rounded-md border px-3 py-1 font-mono text-xs font-semibold tnum"
-          style={{
-            color: leaderColor,
-            borderColor: `${leaderColor}55`,
-            backgroundColor: `${leaderColor}14`,
-          }}
-        >
-          P(victoria) {projection.leader === "sanchez" ? "Sánchez" : "Keiko"}{" "}
-          {pct(pWinLeader * 100, 1)}
-        </span>
-      </header>
+  const pChip = (
+    <span
+      className="rounded-md border px-3 py-1 font-mono text-xs font-semibold tnum"
+      style={{
+        color: leaderColor,
+        borderColor: `${leaderColor}55`,
+        backgroundColor: `${leaderColor}14`,
+      }}
+    >
+      P(victoria) {projection.leader === "sanchez" ? "Sánchez" : "Keiko"}{" "}
+      {pct(pWinLeader * 100, 1)}
+    </span>
+  );
 
+  const body = (
+    <>
       <div className="relative grid grid-cols-2 items-start gap-3 sm:gap-10">
         <Counter
           name="Roberto Sánchez"
@@ -315,7 +300,41 @@ export function FinalVotesHero({ latest }: { latest: Latest }) {
           </div>
         </div>
       </div>
-    </section>
+    </>
+  );
+
+  return (
+    <>
+      <section className="glass lift animate-fadeUp relative overflow-hidden p-5 sm:p-7">
+        {/* ambient leader glow */}
+        <div
+          className="pointer-events-none absolute -top-24 h-48 w-48 rounded-full opacity-30 blur-3xl"
+          style={{
+            left: projection.leader === "sanchez" ? "8%" : "auto",
+            right: projection.leader === "keiko" ? "8%" : "auto",
+            background: leaderColor,
+          }}
+        />
+        <header className="relative mb-4 flex flex-wrap items-center justify-between gap-3 sm:mb-5">
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+            <h2 className="font-display text-sm font-semibold uppercase tracking-[0.16em] text-ink-1">
+              Proyección Final · Votos
+            </h2>
+            <span className="text-[10px] uppercase tracking-[0.14em] text-ink-3">
+              Totales absolutos proyectados · IC 90%
+            </span>
+          </div>
+          <div className="flex items-center gap-2">
+            {pChip}
+            <ExpandButton onClick={() => setOpen(true)} />
+          </div>
+        </header>
+        {body}
+      </section>
+      <CardModal open={open} onClose={() => setOpen(false)} title="Proyección Final · Votos · IC 90%">
+        {body}
+      </CardModal>
+    </>
   );
 }
 

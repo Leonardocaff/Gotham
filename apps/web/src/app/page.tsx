@@ -202,16 +202,18 @@ export default function Page() {
         {/* ── Candidate legend — desktop only, bottom-centre. Hidden while the
             geo drill is open to keep the stage calm. ── */}
         {!geoOpen && (
-          <div className="hud-card pointer-events-none absolute bottom-3 left-1/2 z-20 hidden -translate-x-1/2 items-center gap-3 px-3 py-1.5 text-[10px] lg:flex">
-            <span className="flex items-center gap-1.5">
-              <span className="h-2 w-2 rounded-full bg-accent-emerald" /> Sánchez
-            </span>
-            <span className="flex items-center gap-1.5">
-              <span className="h-2 w-2 rounded-full bg-accent-cyan" /> Keiko
-            </span>
-            <span className="flex items-center gap-1.5">
-              <span className="h-2 w-2 rounded-full bg-accent-rose" /> reñido
-            </span>
+          <div className="pointer-events-none absolute inset-x-0 bottom-7 z-20 hidden justify-center lg:flex">
+            <div className="hud-card flex items-center gap-3.5 px-4 py-2 text-[11px]">
+              <span className="flex items-center gap-1.5">
+                <span className="h-2 w-2 rounded-full bg-accent-emerald" /> Sánchez
+              </span>
+              <span className="flex items-center gap-1.5">
+                <span className="h-2 w-2 rounded-full bg-accent-cyan" /> Keiko
+              </span>
+              <span className="flex items-center gap-1.5">
+                <span className="h-2 w-2 rounded-full bg-accent-rose" /> reñido
+              </span>
+            </div>
           </div>
         )}
 
