@@ -1,0 +1,100 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --canvas: #0a0a0c;
+  --surface-1: rgba(18, 18, 22, 0.75);
+  --surface-2: rgba(26, 26, 32, 0.65);
+  --surface-3: rgba(36, 36, 44, 0.55);
+  --edge: rgba(255, 255, 255, 0.06);
+  --edge-strong: rgba(255, 255, 255, 0.1);
+  --ink-1: #f5f5f7;
+  --ink-2: #b8b8ba;
+  --ink-3: #909092;
+  --cyan: #4a9eff;
+  --emerald: #3dd9a0;
+  --gold: #ffb43c;
+  --rose: #ff7a8a;
+  --purple: #9b7aff;
+}
+
+* {
+  border-color: var(--edge);
+}
+
+html,
+body {
+  background-color: var(--canvas);
+  color: var(--ink-1);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  /* faint radial vignette for depth */
+  background-image:
+    radial-gradient(900px 500px at 18% -10%, rgba(61, 217, 160, 0.06), transparent 60%),
+    radial-gradient(900px 500px at 82% -10%, rgba(74, 158, 255, 0.06), transparent 60%);
+  background-attachment: fixed;
+}
+
+/* Glass surface */
+.glass {
+  background-color: var(--surface-1);
+  backdrop-filter: blur(20px) saturate(150%);
+  -webkit-backdrop-filter: blur(20px) saturate(150%);
+  border: 1px solid var(--edge);
+  border-radius: 16px;
+}
+
+.glass-2 {
+  background-color: var(--surface-2);
+  backdrop-filter: blur(20px) saturate(150%);
+  -webkit-backdrop-filter: blur(20px) saturate(150%);
+  border: 1px solid var(--edge);
+  border-radius: 14px;
+}
+
+.lift {
+  transition:
+    transform 0.22s cubic-bezier(0.2, 0.7, 0.2, 1),
+    border-color 0.22s ease,
+    box-shadow 0.22s ease;
+}
+.lift:hover {
+  transform: translateY(-2px);
+  border-color: var(--edge-strong);
+  box-shadow: 0 14px 40px -18px rgba(0, 0, 0, 0.8);
+}
+
+.tnum {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.16);
+  background-clip: content-box;
+}
+
+/* recharts tooltip baseline reset (we style our own) */
+.recharts-default-tooltip {
+  background: var(--surface-1) !important;
+  border: 1px solid var(--edge-strong) !important;
+  border-radius: 10px !important;
+}

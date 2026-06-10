@@ -1,0 +1,540 @@
+{
+  "generatedAt": "2026-06-10T00:47:14.894523+00:00",
+  "source": {
+    "idEleccion": 10,
+    "portal": "resultadosegundavuelta.onpe.gob.pe",
+    "fechaActualizacion": 1781052120079
+  },
+  "count": {
+    "actasContabilizadasPct": 96.412,
+    "actasEnJeePct": 1.664,
+    "actasPendientesPct": 1.924,
+    "contabilizadas": 89438,
+    "totalActas": 92766,
+    "participacionPct": 69.924,
+    "totalVotosValidos": 17857696,
+    "totalVotosEmitidos": 19106956
+  },
+  "candidates": [
+    {
+      "key": "sanchez",
+      "name": "Roberto Sánchez",
+      "party": "Juntos por el Perú",
+      "color": "#3DD9A0",
+      "votes": 8949555,
+      "pctValidos": 50.116
+    },
+    {
+      "key": "keiko",
+      "name": "Keiko Fujimori",
+      "party": "Fuerza Popular",
+      "color": "#4A9EFF",
+      "votes": 8908141,
+      "pctValidos": 49.884
+    }
+  ],
+  "currentMargin": {
+    "leader": "sanchez",
+    "votes": 41414,
+    "pct": 0.232
+  },
+  "projection": {
+    "leader": "keiko",
+    "p_win": {
+      "sanchez": 0.0599,
+      "keiko": 0.9401
+    },
+    "final_pct": {
+      "sanchez": {
+        "median": 49.897,
+        "ci90": [
+          49.787,
+          50.006
+        ]
+      },
+      "keiko": {
+        "median": 50.103,
+        "ci90": [
+          49.994,
+          50.213
+        ]
+      }
+    },
+    "final_margin": {
+      "median_votes": -38058,
+      "ci90_votes": [
+        -78292,
+        2177
+      ],
+      "median_pct": -0.207,
+      "ci90_pct": [
+        -0.425,
+        0.012
+      ]
+    },
+    "sd_components": {
+      "muestreo_votos": 8882,
+      "deriva_votos": 8408
+    },
+    "bounds": {
+      "margin_votes": [
+        -519101,
+        601929
+      ],
+      "margin_pct": [
+        -2.82,
+        3.27
+      ],
+      "straddles_zero": true
+    },
+    "sensitivity": [
+      {
+        "delta_pp": -3.0,
+        "p_win_sanchez": 0.0017,
+        "margin_votes": -71689,
+        "leader": "keiko"
+      },
+      {
+        "delta_pp": -2.0,
+        "p_win_sanchez": 0.0067,
+        "margin_votes": -60478,
+        "leader": "keiko"
+      },
+      {
+        "delta_pp": -1.5,
+        "p_win_sanchez": 0.0124,
+        "margin_votes": -54873,
+        "leader": "keiko"
+      },
+      {
+        "delta_pp": -1.0,
+        "p_win_sanchez": 0.022,
+        "margin_votes": -49268,
+        "leader": "keiko"
+      },
+      {
+        "delta_pp": -0.5,
+        "p_win_sanchez": 0.0371,
+        "margin_votes": -43663,
+        "leader": "keiko"
+      },
+      {
+        "delta_pp": 0.0,
+        "p_win_sanchez": 0.0599,
+        "margin_votes": -38058,
+        "leader": "keiko"
+      },
+      {
+        "delta_pp": 0.5,
+        "p_win_sanchez": 0.0923,
+        "margin_votes": -32453,
+        "leader": "keiko"
+      },
+      {
+        "delta_pp": 1.0,
+        "p_win_sanchez": 0.1362,
+        "margin_votes": -26847,
+        "leader": "keiko"
+      },
+      {
+        "delta_pp": 1.5,
+        "p_win_sanchez": 0.1926,
+        "margin_votes": -21242,
+        "leader": "keiko"
+      },
+      {
+        "delta_pp": 2.0,
+        "p_win_sanchez": 0.2613,
+        "margin_votes": -15637,
+        "leader": "keiko"
+      },
+      {
+        "delta_pp": 3.0,
+        "p_win_sanchez": 0.4282,
+        "margin_votes": -4427,
+        "leader": "keiko"
+      }
+    ],
+    "exterior": {
+      "actasPct": 60.32,
+      "votos": {
+        "sanchez": 34931,
+        "keiko": 63808
+      },
+      "pctSanchez": 35.38,
+      "remainingVotesEst": 225947,
+      "leanKeikoNetEst": 66080
+    },
+    "decision": "INDECIDIBLE",
+    "decision_reason": "El exterior está 60% contado (pool grande, pro-Keiko) y el margen proyectado es 0.21pp: pivota en data que aún no existe."
+  },
+  "models": [
+    {
+      "key": "naive",
+      "label": "Naíve (swing nacional)",
+      "leader": "sanchez",
+      "final_pct_sanchez": 50.116,
+      "final_margin_votes": 42714
+    },
+    {
+      "key": "stratified",
+      "label": "Estratificado (población finita)",
+      "leader": "keiko",
+      "final_pct_sanchez": 49.897,
+      "final_margin_votes": -38058
+    },
+    {
+      "key": "closed_form",
+      "label": "Forma cerrada (P, IC)",
+      "leader": "keiko",
+      "p_win": {
+        "sanchez": 0.0599,
+        "keiko": 0.9401
+      },
+      "final_pct_sanchez": 49.897,
+      "final_margin_votes": -38058,
+      "ci90_margin_votes": [
+        -78292,
+        2177
+      ]
+    },
+    {
+      "key": "mc_check",
+      "label": "Monte Carlo (verificación)",
+      "leader": "keiko",
+      "p_win": {
+        "sanchez": 0.0595,
+        "keiko": 0.9405
+      },
+      "final_margin_votes": -37961
+    }
+  ],
+  "strata": [
+    {
+      "code": "010000",
+      "name": "AMAZONAS",
+      "region": "selva",
+      "rural": true,
+      "votos": {
+        "sanchez": 125348,
+        "keiko": 69119
+      },
+      "pctSanchez": 64.46,
+      "leader": "sanchez",
+      "actasPct": 99.77
+    },
+    {
+      "code": "020000",
+      "name": "ÁNCASH",
+      "region": "sierra_centro",
+      "rural": true,
+      "votos": {
+        "sanchez": 348825,
+        "keiko": 267471
+      },
+      "pctSanchez": 56.6,
+      "leader": "sanchez",
+      "actasPct": 98.71
+    },
+    {
+      "code": "030000",
+      "name": "APURÍMAC",
+      "region": "sierra_sur",
+      "rural": true,
+      "votos": {
+        "sanchez": 185825,
+        "keiko": 43132
+      },
+      "pctSanchez": 81.16,
+      "leader": "sanchez",
+      "actasPct": 99.24
+    },
+    {
+      "code": "040000",
+      "name": "AREQUIPA",
+      "region": "costa_sur",
+      "rural": false,
+      "votos": {
+        "sanchez": 580426,
+        "keiko": 332286
+      },
+      "pctSanchez": 63.59,
+      "leader": "sanchez",
+      "actasPct": 99.39
+    },
+    {
+      "code": "050000",
+      "name": "AYACUCHO",
+      "region": "sierra_centro",
+      "rural": true,
+      "votos": {
+        "sanchez": 256362,
+        "keiko": 66849
+      },
+      "pctSanchez": 79.32,
+      "leader": "sanchez",
+      "actasPct": 99.21
+    },
+    {
+      "code": "060000",
+      "name": "CAJAMARCA",
+      "region": "sierra_norte",
+      "rural": true,
+      "votos": {
+        "sanchez": 491442,
+        "keiko": 244539
+      },
+      "pctSanchez": 66.77,
+      "leader": "sanchez",
+      "actasPct": 99.41
+    },
+    {
+      "code": "070000",
+      "name": "CUSCO",
+      "region": "sierra_sur",
+      "rural": true,
+      "votos": {
+        "sanchez": 585901,
+        "keiko": 163777
+      },
+      "pctSanchez": 78.15,
+      "leader": "sanchez",
+      "actasPct": 97.76
+    },
+    {
+      "code": "080000",
+      "name": "HUANCAVELICA",
+      "region": "sierra_sur",
+      "rural": true,
+      "votos": {
+        "sanchez": 160659,
+        "keiko": 36707
+      },
+      "pctSanchez": 81.4,
+      "leader": "sanchez",
+      "actasPct": 99.14
+    },
+    {
+      "code": "090000",
+      "name": "HUÁNUCO",
+      "region": "sierra_centro",
+      "rural": true,
+      "votos": {
+        "sanchez": 249970,
+        "keiko": 139754
+      },
+      "pctSanchez": 64.14,
+      "leader": "sanchez",
+      "actasPct": 99.15
+    },
+    {
+      "code": "100000",
+      "name": "ICA",
+      "region": "costa_centro",
+      "rural": false,
+      "votos": {
+        "sanchez": 259131,
+        "keiko": 279728
+      },
+      "pctSanchez": 48.09,
+      "leader": "keiko",
+      "actasPct": 99.1
+    },
+    {
+      "code": "110000",
+      "name": "JUNÍN",
+      "region": "sierra_centro",
+      "rural": true,
+      "votos": {
+        "sanchez": 391453,
+        "keiko": 321180
+      },
+      "pctSanchez": 54.93,
+      "leader": "sanchez",
+      "actasPct": 99.13
+    },
+    {
+      "code": "120000",
+      "name": "LA LIBERTAD",
+      "region": "costa_norte",
+      "rural": false,
+      "votos": {
+        "sanchez": 442887,
+        "keiko": 599810
+      },
+      "pctSanchez": 42.48,
+      "leader": "keiko",
+      "actasPct": 99.32
+    },
+    {
+      "code": "130000",
+      "name": "LAMBAYEQUE",
+      "region": "costa_norte",
+      "rural": false,
+      "votos": {
+        "sanchez": 304695,
+        "keiko": 435721
+      },
+      "pctSanchez": 41.15,
+      "leader": "keiko",
+      "actasPct": 99.64
+    },
+    {
+      "code": "140000",
+      "name": "LIMA",
+      "region": "costa_centro",
+      "rural": false,
+      "votos": {
+        "sanchez": 2267307,
+        "keiko": 3944393
+      },
+      "pctSanchez": 36.5,
+      "leader": "keiko",
+      "actasPct": 96.88
+    },
+    {
+      "code": "150000",
+      "name": "LORETO",
+      "region": "selva",
+      "rural": true,
+      "votos": {
+        "sanchez": 178933,
+        "keiko": 208270
+      },
+      "pctSanchez": 46.21,
+      "leader": "keiko",
+      "actasPct": 95.96
+    },
+    {
+      "code": "160000",
+      "name": "MADRE DE DIOS",
+      "region": "selva",
+      "rural": true,
+      "votos": {
+        "sanchez": 65432,
+        "keiko": 29115
+      },
+      "pctSanchez": 69.21,
+      "leader": "sanchez",
+      "actasPct": 99.01
+    },
+    {
+      "code": "170000",
+      "name": "MOQUEGUA",
+      "region": "costa_sur",
+      "rural": false,
+      "votos": {
+        "sanchez": 88235,
+        "keiko": 33353
+      },
+      "pctSanchez": 72.57,
+      "leader": "sanchez",
+      "actasPct": 99.65
+    },
+    {
+      "code": "180000",
+      "name": "PASCO",
+      "region": "sierra_centro",
+      "rural": true,
+      "votos": {
+        "sanchez": 78518,
+        "keiko": 50699
+      },
+      "pctSanchez": 60.76,
+      "leader": "sanchez",
+      "actasPct": 98.25
+    },
+    {
+      "code": "190000",
+      "name": "PIURA",
+      "region": "costa_norte",
+      "rural": false,
+      "votos": {
+        "sanchez": 440425,
+        "keiko": 583221
+      },
+      "pctSanchez": 43.03,
+      "leader": "keiko",
+      "actasPct": 98.92
+    },
+    {
+      "code": "200000",
+      "name": "PUNO",
+      "region": "sierra_sur",
+      "rural": true,
+      "votos": {
+        "sanchez": 608930,
+        "keiko": 95674
+      },
+      "pctSanchez": 86.42,
+      "leader": "sanchez",
+      "actasPct": 99.3
+    },
+    {
+      "code": "210000",
+      "name": "SAN MARTÍN",
+      "region": "selva",
+      "rural": true,
+      "votos": {
+        "sanchez": 262583,
+        "keiko": 218127
+      },
+      "pctSanchez": 54.62,
+      "leader": "sanchez",
+      "actasPct": 99.45
+    },
+    {
+      "code": "220000",
+      "name": "TACNA",
+      "region": "costa_sur",
+      "rural": false,
+      "votos": {
+        "sanchez": 163032,
+        "keiko": 65417
+      },
+      "pctSanchez": 71.36,
+      "leader": "sanchez",
+      "actasPct": 98.75
+    },
+    {
+      "code": "230000",
+      "name": "TUMBES",
+      "region": "costa_norte",
+      "rural": false,
+      "votos": {
+        "sanchez": 45427,
+        "keiko": 81960
+      },
+      "pctSanchez": 35.66,
+      "leader": "keiko",
+      "actasPct": 99.69
+    },
+    {
+      "code": "240000",
+      "name": "CALLAO",
+      "region": "costa_centro",
+      "rural": false,
+      "votos": {
+        "sanchez": 206765,
+        "keiko": 394407
+      },
+      "pctSanchez": 34.39,
+      "leader": "keiko",
+      "actasPct": 97.62
+    },
+    {
+      "code": "250000",
+      "name": "UCAYALI",
+      "region": "selva",
+      "rural": true,
+      "votos": {
+        "sanchez": 126113,
+        "keiko": 139624
+      },
+      "pctSanchez": 47.46,
+      "leader": "keiko",
+      "actasPct": 97.29
+    }
+  ],
+  "caveat": "Proyección estadística, NO resultado oficial. El conteo ONPE no es la proclamación del JNE (semanas después). Las actas en JEE/pendientes pueden anularse o reasignarse. Con <97% de actas y margen sub-0.5pp, el resultado es genuinamente indecidible."
+}
