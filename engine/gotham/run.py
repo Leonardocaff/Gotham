@@ -9,6 +9,7 @@ import sys
 
 from .ingest.client import OnpeClient, OnpeError
 from .models import ensemble
+from .publish import is_enabled, publish_all
 from .snapshot import build_snapshot
 from .store import append_history, build_contract, write_latest
 
@@ -20,6 +21,10 @@ def run_once(verbose: bool = True) -> dict:
     contract = build_contract(snap, result)
     write_latest(contract)
     append_history(contract)
+    if is_enabled():
+        u, _ = publish_all()
+        if verbose and u:
+            print(f"  ↑ publicado a Blob: {u}")
     if verbose:
         _print_summary(contract)
     return contract

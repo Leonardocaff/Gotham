@@ -5,6 +5,10 @@ import type { Latest, HistoryPoint } from "./types";
 
 const POLL_MS = 30_000;
 
+// Fuente de datos: en Vercel apunta al store externo (Vercel Blob) para data en vivo
+// sin redeploy; en local cae a los archivos estáticos que escribe el poller.
+const DATA_BASE = (process.env.NEXT_PUBLIC_DATA_BASE_URL ?? "/data").replace(/\/$/, "");
+
 export interface LiveState {
   latest: Latest | null;
   history: HistoryPoint[];
@@ -41,8 +45,8 @@ export function useLiveData(): LiveState {
   const load = useCallback(async () => {
     try {
       const [latestRes, historyRes] = await Promise.all([
-        fetch(`/data/latest.json?t=${Date.now()}`, { cache: "no-store" }),
-        fetch(`/data/history.jsonl?t=${Date.now()}`, { cache: "no-store" }),
+        fetch(`${DATA_BASE}/latest.json?t=${Date.now()}`, { cache: "no-store" }),
+        fetch(`${DATA_BASE}/history.jsonl?t=${Date.now()}`, { cache: "no-store" }),
       ]);
 
       if (!latestRes.ok) throw new Error(`latest.json: HTTP ${latestRes.status}`);
