@@ -3,8 +3,9 @@
 Reporta, lado a lado: el método naíve (titular), el estratificado (data-driven), la
 inferencia en forma cerrada (P y IC), las cotas de Manski (lo posible), el barrido de
 sensibilidad (lo asumido) y un Monte Carlo de verificación. El veredicto NO esconde
-incertidumbre: si las cotas cruzan cero o la sensibilidad cambia el líder dentro del
-rango plausible, dice INDECIDIBLE.
+incertidumbre: si el IC90 del margen cruza cero o la sensibilidad cambia el líder dentro
+del rango de deriva plausible (±1.5pp), dice INDECIDIBLE. Las cotas de Manski entran como
+información (peor caso lógicamente posible, sin probabilidad), no como gate del veredicto.
 """
 from __future__ import annotations
 
@@ -28,25 +29,47 @@ def _exterior(snap: Snapshot) -> dict:
 
 
 def _decision(p_win_leader: float, cf_ci: list[float], bounds_straddle: bool,
-              ext_pct: float, margin_pct_abs: float, sens) -> tuple[str, str]:
+              ext_pct: float, margin_pct_abs: float, sens,
+              leader_name: str, counted_pct: float) -> tuple[str, str]:
+    """Veredicto basado en la EVIDENCIA EXISTENTE, no en el peor caso lógicamente posible.
+
+    Las cotas de Manski (bounds_straddle) describen lo que sería posible si CADA voto
+    restante fuera en una sola dirección — un escenario sin probabilidad, no una
+    incertidumbre. Por eso entran como *información* (panel ManskiBounds), no como
+    gate del veredicto. El veredicto se decide por:
+      • P(líder) — masa de probabilidad bajo el modelo estratificado de población finita,
+      • IC90 del margen — ¿cruza cero la incertidumbre real (muestral + deriva + sesgo)?,
+      • robustez a la deriva — ¿el líder cambia dentro de ±1.5pp de deriva plausible?,
+      • completitud — exterior y conteo nacional.
+    """
     cf_crosses = cf_ci[0] < 0 < cf_ci[1]
     # ¿el líder cambia dentro de la deriva plausible (±1.5pp)?
     leaders = {row["leader"] for row in sens if abs(row["delta_pp"]) <= 1.5}
     flips_within_plausible = len(leaders) > 1
 
+    # — INDECIDIBLE: la evidencia real no separa a los candidatos —
     if ext_pct < 80.0 and margin_pct_abs < 0.5:
         return "INDECIDIBLE", (
             f"El exterior está {ext_pct:.0f}% contado (pool grande, pro-Keiko) y el margen "
             f"proyectado es {margin_pct_abs:.2f}pp: pivota en data que aún no existe.")
-    if flips_within_plausible or cf_crosses or bounds_straddle:
+    if flips_within_plausible or cf_crosses or p_win_leader < 0.80:
         return "INDECIDIBLE", (
-            f"P(líder)={p_win_leader:.0%}, pero el líder cambia dentro de la deriva "
-            f"plausible (±1.5pp) y/o el IC90 cruza cero. Empate estadístico.")
-    if p_win_leader >= 0.95:
-        return "DECIDIDO", f"P(líder)={p_win_leader:.0%}, robusto a la deriva e IC90 sin cruzar cero."
-    if p_win_leader >= 0.65:
-        return "INCLINADO", f"P(líder)={p_win_leader:.0%}; favorito claro pero no cerrado."
-    return "INDECIDIBLE", f"P(líder)={p_win_leader:.0%}: empate estadístico."
+            f"P({leader_name})={p_win_leader:.0%}, pero el IC90 del margen cruza cero "
+            f"y/o el líder cambia dentro de la deriva plausible (±1.5pp). Empate estadístico.")
+
+    # — DECIDIDO: P alta, IC90 sin cruzar, robusto, y el conteo ya cerró el margen —
+    closed = counted_pct >= 99.5 or margin_pct_abs >= 1.0
+    if p_win_leader >= 0.95 and closed:
+        return "DECIDIDO", (
+            f"P({leader_name})={p_win_leader:.0%}, IC90 sin cruzar cero, robusto a ±1.5pp de "
+            f"deriva y con {counted_pct:.1f}% de actas contabilizadas.")
+
+    # — INCLINADO: favorito claro y robusto, pero el margen es fino y aún falta cerrar —
+    note = (f"margen {margin_pct_abs:.2f}pp con {counted_pct:.1f}% contado aún puede moverse"
+            if margin_pct_abs < 1.0 else f"{counted_pct:.1f}% contado, falta cerrar")
+    return "INCLINADO", (
+        f"P({leader_name})={p_win_leader:.0%}: {leader_name} favorito claro y robusto a la "
+        f"deriva, pero {note}; no alcanza el umbral de cierre.")
 
 
 def evaluate(snap: Snapshot) -> dict:
@@ -67,9 +90,11 @@ def evaluate(snap: Snapshot) -> dict:
     leader = cf["leader"]
     p_win_leader = cf["p_win"][leader]
     margin_pct_abs = abs(cf["final_margin_pct"]["median"])
+    leader_name = "Sánchez" if leader == "sanchez" else "Keiko"
     decision, reason = _decision(p_win_leader, cf["final_margin_votes"]["ci90"],
                                  bounds["straddles_zero"] or contested_scen["flips_within_grid"],
-                                 ext["actasPct"], margin_pct_abs, sens)
+                                 ext["actasPct"], margin_pct_abs, sens,
+                                 leader_name, snap.actas_contabilizadas_pct)
 
     methods = [
         {"key": "naive", "label": naive["label"], "leader": naive["leader"],
