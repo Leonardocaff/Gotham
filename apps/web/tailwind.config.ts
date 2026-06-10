@@ -48,11 +48,16 @@ const config: Config = {
           "0%": { opacity: "0", transform: "translateY(8px)" },
           "100%": { opacity: "1", transform: "translateY(0)" },
         },
+        sheen: {
+          "0%": { transform: "translateX(-120%)" },
+          "100%": { transform: "translateX(220%)" },
+        },
       },
       animation: {
         pulseDot: "pulseDot 1.6s ease-in-out infinite",
         flash: "flash 1.1s ease-out",
         fadeUp: "fadeUp 0.5s ease-out both",
+        sheen: "sheen 2.8s ease-in-out infinite",
       },
     },
   },

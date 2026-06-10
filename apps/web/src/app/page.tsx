@@ -7,6 +7,7 @@ import type { GlobeSelection } from "@/components/globe/Globe";
 import { DrillDown } from "@/components/globe/DrillDown";
 import { Header } from "@/components/panels/Header";
 import { Verdict } from "@/components/panels/Verdict";
+import { FinalVotesHero } from "@/components/panels/FinalVotesHero";
 import { NowVsProjection } from "@/components/panels/NowVsProjection";
 import { Uncertainty } from "@/components/panels/Uncertainty";
 import { Methods } from "@/components/panels/Methods";
@@ -69,6 +70,11 @@ export default function Page() {
   return (
     <main className="mx-auto max-w-[1480px] px-4 py-6 sm:px-6 lg:px-8">
       <Header latest={latest} />
+
+      {/* Money shot: projected final absolute vote counts */}
+      <div className="mt-5">
+        <FinalVotesHero latest={latest} />
+      </div>
 
       {/* Hero row: globe + verdict / now-vs-projection */}
       <div className="mt-5 grid grid-cols-1 gap-4 lg:grid-cols-12">

@@ -28,6 +28,17 @@ export interface FinalPct {
   ci90: [number, number];
 }
 
+export interface FinalVotesEntry {
+  median: number;
+  ci90: [number, number];
+}
+
+export interface FinalVotes {
+  sanchez: FinalVotesEntry;
+  keiko: FinalVotesEntry;
+  total: number;
+}
+
 export interface SdComponents {
   muestreo_votos: number;
   deriva_votos: number;
@@ -92,6 +103,7 @@ export interface Contested {
 export interface Projection {
   leader: CandidateKey;
   p_win: Record<CandidateKey, number>;
+  final_votes: FinalVotes;
   final_pct: Record<CandidateKey, FinalPct>;
   final_margin: {
     median_votes: number;
