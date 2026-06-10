@@ -17,6 +17,7 @@
     "recharts": "2.12.7"
   },
   "devDependencies": {
+    "@types/geojson": "7946.0.16",
     "@types/mapbox-gl": "3.4.0",
     "@types/node": "20.14.10",
     "@types/react": "18.3.3",
