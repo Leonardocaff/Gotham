@@ -89,10 +89,12 @@ export default function Page() {
       <Header latest={latest} />
 
       {/* ── Cinematic globe hero ───────────────────────────────────────────
-       * The planet floats borderless in deep space. On desktop, HUD cards hover
-       * over the corners and the projected-votes hero overlaps the lower third
-       * for depth. On phones the globe is shorter and the HUD collapses to a
-       * single status chip — Verdict, legend and votes simply stack below.
+       * The planet is the immersive stage. On desktop EXACTLY TWO hero cards
+       * float over it: the Verdict in the upper-right corner, and the wide
+       * FinalVotes readout anchored across the globe's base. The planet keeps
+       * clear "breathing" space between them. On phones the HUD collapses to a
+       * single status chip and both heroes drop OUT of the overlay to stack as
+       * full-width cards directly below the globe.
        */}
       <section className="relative mt-6">
         {/* ambient glow pooled behind the planet */}
@@ -100,13 +102,14 @@ export default function Page() {
           className="pointer-events-none absolute inset-x-0 top-0 -z-0 h-[60vh] opacity-70"
           style={{
             background:
-              "radial-gradient(720px 460px at 50% 34%, rgba(74,158,255,0.10), transparent 70%), radial-gradient(820px 520px at 50% 60%, rgba(61,217,160,0.08), transparent 72%)",
+              "radial-gradient(720px 460px at 50% 32%, rgba(74,158,255,0.10), transparent 70%), radial-gradient(820px 520px at 50% 56%, rgba(61,217,160,0.08), transparent 72%)",
           }}
         />
 
-        {/* Globe band — shorter on phones so it doesn't eat the first screen,
-            tall and near full-bleed on desktop. */}
-        <div className="relative h-[52vh] min-h-[340px] sm:h-[64vh] sm:min-h-[480px] lg:h-[74vh]">
+        {/* Globe stage. Taller on desktop so two cards can float with the planet
+            still reading clearly between them; shorter on phones (~50vh) so it
+            doesn't eat the first screen. */}
+        <div className="relative h-[50vh] min-h-[340px] sm:h-[64vh] sm:min-h-[480px] lg:h-[78vh] lg:min-h-[620px]">
           <Globe
             strata={latest.strata}
             continents={latest.exteriorByContinent}
@@ -128,15 +131,15 @@ export default function Page() {
             </div>
           </div>
 
-          {/* HUD: verdict — top-right (desktop only; mobile/tablet get a full
-              card below the hero). */}
-          <div className="absolute right-3 top-3 z-20 hidden lg:block">
+          {/* HERO 1 — Verdict: floats top-right over the globe (desktop only;
+              mobile gets a full-width card stacked below the globe). */}
+          <div className="hero-float-tr animate-fadeUp absolute right-3 top-3 z-30 hidden lg:block">
             <Verdict latest={latest} compact />
           </div>
 
-          {/* HUD: legend — bottom-left, desktop only (mobile gets the slim
-              caption rendered under the globe band). */}
-          <div className="hud-card pointer-events-none absolute bottom-3 left-3 z-20 hidden items-center gap-3 px-3 py-1.5 text-[10px] sm:bottom-5 sm:left-5 sm:flex">
+          {/* Legend — bottom-left, desktop only. Tucked above the anchored votes
+              bar so it doesn't collide with it. */}
+          <div className="hud-card pointer-events-none absolute bottom-[34%] left-3 z-20 hidden items-center gap-3 px-3 py-1.5 text-[10px] sm:bottom-5 lg:bottom-[40%] lg:left-5 lg:flex">
             <span className="flex items-center gap-1.5">
               <span className="h-2 w-2 rounded-full bg-accent-emerald" /> Sánchez
             </span>
@@ -146,16 +149,23 @@ export default function Page() {
             <span className="text-ink-3">intensidad = margen</span>
           </div>
 
-          {/* Drill-down: on phones it renders as a bottom sheet (handled inside
-              DrillDown); on desktop it floats top-right, pushed below the
-              verdict HUD via the offset wrapper. */}
-          <div className="lg:[&>*]:!top-[230px]">
+          {/* HERO 2 — FinalVotes: the headline. Anchored as a wide readout bar
+              across the lower band of the globe on desktop. Centred and padded
+              so the planet still breathes on either side. Desktop-only here;
+              mobile renders it below the globe in the stack. */}
+          <div className="hero-anchor animate-fadeUp pointer-events-auto absolute inset-x-4 bottom-4 z-30 mx-auto hidden max-w-[1080px] lg:block xl:inset-x-10">
+            <FinalVotesHero latest={latest} hud />
+          </div>
+
+          {/* Drill-down: phones → bottom sheet; desktop → floats top-right,
+              pushed below the Verdict hero via the offset wrapper. */}
+          <div className="lg:[&>*]:!top-[250px]">
             <DrillDown selection={selection} onClose={() => setSelection(null)} />
           </div>
         </div>
 
         {/* Mobile legend caption — replaces the floating legend HUD on phones. */}
-        <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1.5 px-1 text-[10px] text-ink-3 sm:hidden">
+        <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1.5 px-1 text-[10px] text-ink-3 lg:hidden">
           <span className="flex items-center gap-1.5">
             <span className="h-2 w-2 rounded-full bg-accent-emerald" /> Sánchez
           </span>
@@ -164,58 +174,62 @@ export default function Page() {
           </span>
           <span>intensidad = margen · toca un departamento para enfocar</span>
         </div>
-
-        {/* Projected-votes hero — overlaps the lower third of the globe on
-            desktop; on phones it simply sits below the globe (no overlap). */}
-        <div className="relative z-30 mt-5 px-0 sm:-mt-24 sm:px-6 lg:px-12">
-          <FinalVotesHero latest={latest} />
-        </div>
       </section>
 
-      {/* Verdict as a full card on screens without the HUD overlay */}
+      {/* ── Mobile / tablet hero stack ─────────────────────────────────────
+       * Below the globe the two protagonists stack full-width: FinalVotes
+       * (the headline) then Verdict. Hidden on desktop, where both float over
+       * the globe instead. */}
       <div className="mt-5 grid grid-cols-1 gap-4 lg:hidden">
+        <FinalVotesHero latest={latest} />
         <Verdict latest={latest} />
       </div>
 
-      {/* ── Floating analyst grid ──────────────────────────────────────────
-       * Every card a floating pane of glass, gently drifting in place. */}
-      <div className="mt-5 grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
-        <Float delay={0}>
-          <Methods latest={latest} />
-        </Float>
-        <Float delay={1}>
-          <Uncertainty latest={latest} />
-        </Float>
-        <Float delay={2}>
-          <ManskiBounds latest={latest} />
-        </Float>
-        <Float delay={3}>
-          <ActasComposition latest={latest} />
-        </Float>
-        <Float delay={4}>
-          <Sensitivity latest={latest} />
-        </Float>
-        <Float delay={5}>
-          <Exterior latest={latest} />
-        </Float>
-      </div>
-
-      {/* Wide row: contested grid + time series */}
-      <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-12">
-        <Float delay={1} className="lg:col-span-7">
-          <ContestedGrid latest={latest} />
-        </Float>
-        <Float delay={3} className="lg:col-span-5">
-          <TimeSeries history={history} />
-        </Float>
-      </div>
-
-      {/* Now vs Projection + Departments leaderboard */}
-      <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-12">
-        <Float delay={2} className="lg:col-span-5">
+      {/* ── Analyst grid ───────────────────────────────────────────────────
+       * One unified, rhythmic 3-column grid (2 on tablet, 1 on phone). Wide
+       * cards span 2–3 columns so the grid reads intentional, not ragged.
+       * Reading order: orientation (now-vs-projection, methods) → uncertainty
+       * (uncertainty, manski) → composition/contested/sensitivity → exterior →
+       * time series + departments. Every card a floating pane of glass.
+       */}
+      <div className="mt-8 grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+        {/* Row: orientation */}
+        <Float delay={0} className="md:col-span-2 xl:col-span-1">
           <NowVsProjection latest={latest} />
         </Float>
-        <Float delay={0} className="lg:col-span-7">
+        <Float delay={1} className="md:col-span-2">
+          <Methods latest={latest} />
+        </Float>
+
+        {/* Row: uncertainty */}
+        <Float delay={2}>
+          <Uncertainty latest={latest} />
+        </Float>
+        <Float delay={3} className="md:col-span-2 xl:col-span-2">
+          <ManskiBounds latest={latest} />
+        </Float>
+
+        {/* Row: composition + sensitivity */}
+        <Float delay={4}>
+          <ActasComposition latest={latest} />
+        </Float>
+        <Float delay={5}>
+          <Sensitivity latest={latest} />
+        </Float>
+        <Float delay={0}>
+          <Exterior latest={latest} />
+        </Float>
+
+        {/* Wide row: contested grid (table) spans the full width */}
+        <Float delay={2} className="md:col-span-2 xl:col-span-3">
+          <ContestedGrid latest={latest} />
+        </Float>
+
+        {/* Wide row: time series + departments leaderboard */}
+        <Float delay={1} className="md:col-span-2 xl:col-span-1">
+          <TimeSeries history={history} />
+        </Float>
+        <Float delay={3} className="md:col-span-2 xl:col-span-2">
           <Strata
             strata={latest.strata}
             selectedCode={

@@ -62,7 +62,7 @@ function Counter({
       </span>
 
       <span
-        className={`tnum mt-3 max-w-full truncate font-mono text-[1.9rem] font-semibold leading-none tracking-tight sm:text-5xl lg:text-6xl ${
+        className={`tnum mt-3 max-w-full truncate font-mono text-[1.7rem] font-semibold leading-none tracking-tight sm:text-5xl lg:text-[3.4rem] ${
           flash ? "animate-flash" : ""
         }`}
         style={{
@@ -97,7 +97,7 @@ function HeadToHeadBar({
   kVotes,
   sCi,
   kCi,
-  leader,
+  leader: _leader,
 }: {
   sVotes: number;
   kVotes: number;
@@ -177,7 +177,16 @@ function HeadToHeadBar({
   );
 }
 
-export function FinalVotesHero({ latest }: { latest: Latest }) {
+export function FinalVotesHero({
+  latest,
+  hud = false,
+}: {
+  latest: Latest;
+  /** HUD mode: stronger glass tint + tighter rhythm so it reads while floating
+   * anchored over the dark globe. Default (false) is the standalone card used
+   * in the mobile stack. */
+  hud?: boolean;
+}) {
   const { projection, candidates } = latest;
   const fv = projection.final_votes;
   const [sCand, kCand] = candidates;
@@ -200,7 +209,11 @@ export function FinalVotesHero({ latest }: { latest: Latest }) {
   const leadVotes = Math.abs(marginVotes);
 
   return (
-    <section className="glass lift animate-fadeUp relative overflow-hidden p-5 sm:p-7">
+    <section
+      className={`lift animate-fadeUp relative overflow-hidden ${
+        hud ? "hud-card p-4 sm:p-5 lg:px-7 lg:py-5" : "glass p-5 sm:p-7"
+      }`}
+    >
       {/* ambient leader glow */}
       <div
         className="pointer-events-none absolute -top-24 h-48 w-48 rounded-full opacity-30 blur-3xl"
@@ -211,7 +224,7 @@ export function FinalVotesHero({ latest }: { latest: Latest }) {
         }}
       />
 
-      <header className="relative mb-5 flex flex-wrap items-center justify-between gap-3">
+      <header className="relative mb-4 flex flex-wrap items-center justify-between gap-3 sm:mb-5">
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
           <h2 className="font-display text-sm font-semibold uppercase tracking-[0.16em] text-ink-1">
             Proyección Final · Votos
@@ -258,7 +271,7 @@ export function FinalVotesHero({ latest }: { latest: Latest }) {
         />
       </div>
 
-      <div className="relative mt-6">
+      <div className="relative mt-5 sm:mt-6">
         <HeadToHeadBar
           sVotes={fv.sanchez.median}
           kVotes={fv.keiko.median}
@@ -268,7 +281,7 @@ export function FinalVotesHero({ latest }: { latest: Latest }) {
         />
       </div>
 
-      <div className="relative mt-6 grid grid-cols-2 gap-3 border-t border-edge pt-4 sm:grid-cols-4">
+      <div className="relative mt-5 grid grid-cols-2 gap-3 border-t border-edge pt-4 sm:mt-6 sm:grid-cols-4">
         <div>
           <div className="text-[10px] uppercase tracking-[0.14em] text-ink-3">
             Ventaja líder
