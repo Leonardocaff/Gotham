@@ -40,15 +40,20 @@ def _session() -> requests.Session:
     return s
 
 
-def _get(path: str, **params: Any) -> Any | None:
-    try:
-        r = _session().get(BACKEND + path, params=params, timeout=30)
-        if "json" not in r.headers.get("content-type", ""):
-            return None
-        body = r.json()
-        return body.get("data") if body.get("success") else None
-    except Exception:  # noqa: BLE001 — un acta caída no debe tumbar el barrido
-        return None
+def _get(path: str, _retries: int = 2, **params: Any) -> Any | None:
+    """GET con reintento ligero — sobre ~92.7k mesas, un fallo transitorio no debe
+    perder un acta. Devuelve None solo si agota reintentos o la respuesta no es JSON."""
+    for attempt in range(_retries + 1):
+        try:
+            r = _session().get(BACKEND + path, params=params, timeout=30)
+            if "json" not in r.headers.get("content-type", ""):
+                return None
+            body = r.json()
+            return body.get("data") if body.get("success") else None
+        except Exception:  # noqa: BLE001 — red/timeout; reintentar salvo el último
+            if attempt >= _retries:
+                return None
+    return None
 
 
 def list_district_actas(ubigeo: int, ambito: int = 1) -> list[dict[str, Any]]:
@@ -137,6 +142,45 @@ def _pps_sample_districts(districts: list[dict[str, Any]], target_mesas: int,
         chosen.append(d)
         acc += d.get("actas", 0)
     return chosen
+
+
+def _fetch_details(ids: list[int], workers: int) -> list[dict[str, Any]]:
+    """Trae el detalle de cada acta en paralelo, con una segunda pasada para los
+    ids que fallaron (None) — así el barrido completo no pierde mesas por baches."""
+    out: list[dict[str, Any]] = []
+    failed: list[int] = []
+    with ThreadPoolExecutor(max_workers=workers) as ex:
+        for i, m in zip(ids, ex.map(fetch_acta, ids)):
+            (out if m is not None else failed).append(m if m is not None else i)
+    out = [m for m in out if isinstance(m, dict)]
+    if failed:                                   # reintento de los caídos
+        with ThreadPoolExecutor(max_workers=workers) as ex:
+            for m in ex.map(fetch_acta, failed):
+                if m is not None:
+                    out.append(m)
+    return out
+
+
+def fetch_all_mesas(districts: list[dict[str, Any]], workers: int = 28) -> dict[str, Any]:
+    """Barrido COMPLETO: TODAS las mesas del país (~92.7k). Lista cada distrito y trae
+    el detalle de cada acta en paralelo. ~25 min. Para cobertura total (no muestral)."""
+    ids: list[int] = []
+    with ThreadPoolExecutor(max_workers=workers) as ex:
+        for actas in ex.map(lambda d: list_district_actas(int(d["dist_code"])), districts):
+            ids.extend(a["id"] for a in actas if a.get("id") is not None)
+    mesas = _fetch_details(ids, workers)
+    return {
+        "mesas": mesas,
+        "meta": {
+            "mode": "full",
+            "districtsSampled": len(districts),
+            "districtsTotal": len({(d["dep_code"], d.get("dist_code")) for d in districts}),
+            "departmentsCovered": len({d["dep_code"] for d in districts}),
+            "actasListed": len(ids),
+            "mesasFetched": len(mesas),
+            "seed": 0,
+        },
+    }
 
 
 def sample_mesas(districts: list[dict[str, Any]], target_mesas: int = 11000,

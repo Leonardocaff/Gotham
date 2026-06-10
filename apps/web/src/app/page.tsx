@@ -7,6 +7,7 @@ import { useHierarchy } from "@/lib/useHierarchy";
 import { useDeepForensics } from "@/lib/useDeepForensics";
 import type { GlobeSelection } from "@/components/globe/Globe";
 import { GeoExplorer, type GeoPath } from "@/components/globe/GeoExplorer";
+import { ContinentCard } from "@/components/globe/ContinentCard";
 import { Verdict } from "@/components/panels/Verdict";
 import { FinalVotesHero } from "@/components/panels/FinalVotesHero";
 import { AnalystBriefing } from "@/components/panels/AnalystBriefing";
@@ -49,12 +50,14 @@ export default function Page() {
   const [selection, setSelection] = useState<GlobeSelection>(null);
   const [geoPath, setGeoPath] = useState<GeoPath | null>(null);
 
-  // Globe → page. A dept selection opens the explorer at that department.
+  // Globe → page. A dept selection opens the geo explorer at that department; a
+  // continent selection opens the exterior card (and closes the dept drill).
   const onGlobeSelect = useCallback((sel: GlobeSelection) => {
     setSelection(sel);
     if (sel?.kind === "dept") {
       setGeoPath({ depCode: sel.data.code });
-    } else if (sel === null) {
+    } else {
+      // continent or deselect → no department drill open
       setGeoPath(null);
     }
   }, []);
@@ -223,6 +226,20 @@ export default function Page() {
                 hierarchy={hierarchy}
                 latest={latest}
                 onNavigate={onExplorerNavigate}
+                onClose={onExplorerClose}
+              />
+            </div>
+          </div>
+        )}
+
+        {/* ── Exterior card — opened by clicking a continent marker on the globe.
+            Same float position as the geo drill so the stage stays consistent. ── */}
+        {selection?.kind === "continent" && (
+          <div className="pointer-events-none absolute inset-0 z-40">
+            <div className="pointer-events-auto absolute inset-x-3 top-16 max-h-[calc(54vh-5rem)] overflow-y-auto sm:top-20 lg:inset-x-auto lg:right-4 lg:top-1/2 lg:max-h-[78vh] lg:w-[360px] lg:-translate-y-1/2">
+              <ContinentCard
+                continent={selection.data}
+                latest={latest}
                 onClose={onExplorerClose}
               />
             </div>

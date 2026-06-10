@@ -347,6 +347,18 @@ export default function Globe({
           "circle-opacity": 0.95,
         },
       });
+      // Transparent, generous hit target so the small exterior dots are easy to
+      // click/hover (the visible dot can be ~4px; this gives a comfortable grab).
+      map.addLayer({
+        id: "continents-hit",
+        type: "circle",
+        source: "continents",
+        paint: {
+          "circle-radius": 18,
+          "circle-color": "#000000",
+          "circle-opacity": 0.001,
+        },
+      });
       map.addLayer({
         id: "continents-label",
         type: "symbol",
@@ -562,12 +574,12 @@ export default function Globe({
       };
 
       map.on("click", deptClickLayer, onDeptClick);
-      map.on("click", "continents-dot", onContinentClick);
+      map.on("click", "continents-hit", onContinentClick);
 
       // click empty space → national view
       map.on("click", (e: MapMouseEvent) => {
         const hits = map.queryRenderedFeatures(e.point, {
-          layers: [deptClickLayer, "continents-dot"].filter((l) =>
+          layers: [deptClickLayer, "continents-hit"].filter((l) =>
             map.getLayer(l),
           ),
         });
@@ -579,7 +591,7 @@ export default function Globe({
         }
       });
 
-      for (const l of [deptClickLayer, "continents-dot"]) {
+      for (const l of [deptClickLayer, "continents-hit"]) {
         if (!map.getLayer(l)) continue;
         map.on("mouseenter", l, () => {
           map.getCanvas().style.cursor = "pointer";
@@ -588,6 +600,31 @@ export default function Globe({
           map.getCanvas().style.cursor = "";
         });
       }
+
+      // ── HOVER de continentes: mismo tooltip vivo que los departamentos. ──
+      const onContinentMove = (e: MapMouseEvent) => {
+        const f = e.features?.[0];
+        const code = f?.properties?.code as string | undefined;
+        const c = code
+          ? continentsRef.current.find((x) => x.code === code)
+          : undefined;
+        if (!c) {
+          setHover(null);
+          return;
+        }
+        setHover({
+          name: c.name,
+          pctSanchez: c.pctSanchez,
+          leader: c.leader,
+          actasPct: c.actasPct,
+          votosS: c.votos.sanchez,
+          votosK: c.votos.keiko,
+          x: e.point.x,
+          y: e.point.y,
+        });
+      };
+      map.on("mousemove", "continents-hit", onContinentMove);
+      map.on("mouseleave", "continents-hit", () => setHover(null));
 
       // ── HOVER de departamentos: resalta la unidad bajo el cursor y muestra un
       // tooltip con su data viva (split, líder, % actas). ──
@@ -693,6 +730,14 @@ export default function Globe({
       return;
     }
 
+    if (selection.kind === "continent") {
+      // exterior selected → drop any department highlight; fly handled on click
+      lastFlownRef.current = null;
+      if (map.getLayer("depts-sel")) {
+        map.setFilter("depts-sel", ["==", ["get", "g_code"], "__none__"]);
+      }
+      return;
+    }
     if (selection.kind !== "dept") return;
     const code = selection.data.code;
     if (lastFlownRef.current === code) return; // already centred here
