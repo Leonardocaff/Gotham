@@ -170,22 +170,21 @@ def analyze(districts: list[dict[str, Any]], snap: Snapshot) -> dict[str, Any]:
     flagged = [s for s in signals if s["verdict"] == "ATENCION"]
     if not flagged:
         overall_verdict = "SIN INDICIOS"
-        summary = ("Ningún tamiz de dígitos (Benford 2BL/1BL, último dígito) se desvía de "
-                   "forma significativa y material del conteo limpio esperado. No hay "
-                   "evidencia estadística de manipulación en los datos publicados. La "
-                   "incertidumbre del resultado es muestral y de completitud, no de integridad.")
+        summary = ("Las tres pruebas de dígitos (Benford 1° y 2° dígito, último dígito) salen "
+                   "limpias. No hay rastro estadístico de manipulación en lo publicado. Lo que "
+                   "queda abierto es por cuánto falta contar, no por la integridad del conteo.")
     else:
         names = ", ".join(s["label"] for s in flagged)
         overall_verdict = "REVISAR"
-        summary = (f"Señal(es) que ameritan auditoría: {names}. Un rechazo de Benford NO es "
-                   "prueba de fraude (falsos positivos conocidos); es motivo para que un "
-                   "auditor revise la granularidad de acta de las zonas señaladas.")
+        summary = (f"Hay una señal que vale revisar: {names}. Que Benford se desvíe no prueba "
+                   "fraude (suele dar falsas alarmas); solo indica qué actas conviene auditar "
+                   "una por una.")
 
     return {
         "signals": signals,
         "ledger": ledger,
         "overall": {"verdict": overall_verdict, "summary": summary},
-        "disclaimer": ("Forense estadístico de tamizaje. Estos tests NO prueban fraude — "
-                       "señalan dónde mirar. La proclamación y la validez legal de las actas "
-                       "competen al JNE, no a este modelo."),
+        "disclaimer": ("Es un tamiz estadístico, no una prueba. Ninguna de estas señales acusa "
+                       "fraude por sí sola; solo dice dónde mirar. Quien valida y proclama las "
+                       "actas es el JNE, no este modelo."),
     }

@@ -15,9 +15,9 @@ from .config import CANDIDATES, HIERARCHY_PATH, HISTORY_PATH, LATEST_PATH
 from .snapshot import Snapshot
 
 CAVEAT = (
-    "Proyección estadística, NO resultado oficial. El conteo ONPE no es la proclamación "
-    "del JNE (semanas después). Las actas en JEE/pendientes pueden anularse o reasignarse. "
-    "Con <97% de actas y margen sub-0.5pp, el resultado es genuinamente indecidible."
+    "Esto es una proyección, no el resultado oficial. El conteo de ONPE no es la "
+    "proclamación del JNE, que llega semanas después y puede anular o reasignar actas. "
+    "Con menos del 97% contado y un margen por debajo de 0.5pp, la elección sigue abierta."
 )
 
 

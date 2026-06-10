@@ -26,7 +26,7 @@ export function Exterior({ latest }: { latest: Latest }) {
   return (
     <Panel
       title="Voto en el exterior"
-      hint={`Pool grande (${pct(ext.pctSanchez, 0)} Sánchez), pro-${CANDIDATE_SHORT[extLeader]} y aún incompleto — pivote de la elección`}
+      hint={`Un bloque grande de votos (${pct(ext.pctSanchez, 0)} Sánchez), pro-${CANDIDATE_SHORT[extLeader]} y todavía sin terminar de contar. Puede mover la elección.`}
       aside={
         <span
           className="rounded-md border px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide"

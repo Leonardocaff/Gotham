@@ -40,7 +40,7 @@ export function Methodology({ latest }: { latest: Latest }) {
   return (
     <Panel
       title="Metodología"
-      hint="Cómo Gotham proyecta el resultado — sin caja negra"
+      hint="Cómo se calcula la proyección, paso a paso"
       aside={
         <a
           href={REPO}

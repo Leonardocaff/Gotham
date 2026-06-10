@@ -154,20 +154,20 @@ def analyze(scan: dict[str, Any]) -> dict[str, Any]:
     integrity_breach = impossible["count"] > 0
     if not flagged and not integrity_breach:
         verdict = "SIN INDICIOS"
-        summary = (f"Sobre {len(mesas):,} mesas (conteos crudos), ningún test de dígitos se "
-                   "desvía de forma material del conteo limpio, y no hay mesas con aritmética "
-                   "imposible. La muestra no muestra evidencia estadística de manipulación.")
+        summary = (f"Revisamos {len(mesas):,} mesas con sus conteos crudos. El último dígito sale "
+                   "limpio y ninguna mesa tiene números imposibles. En esta muestra no aparece "
+                   "rastro de manipulación.")
     elif integrity_breach and not flagged:
         verdict = "REVISAR"
-        summary = (f"{impossible['count']} mesa(s) con aritmética imposible (votos/asistentes "
-                   "que exceden el padrón). Probablemente errores de digitación, pero ameritan "
-                   "verificación del acta física. Los tests de dígitos salen limpios.")
+        summary = (f"Encontramos {impossible['count']} mesa(s) con números que no cuadran (más "
+                   "votos o asistentes que electores). Casi siempre son errores de tipeo, pero "
+                   "conviene cotejar el acta física. Las pruebas de dígitos salen limpias.")
     else:
         names = ", ".join(s["label"] for s in flagged)
         verdict = "REVISAR"
-        summary = (f"Señal(es) de dígitos que ameritan auditoría: {names}"
-                   + (f"; además {impossible['count']} mesa(s) imposible(s)." if integrity_breach else ".")
-                   + " Un rechazo NO prueba fraude; localiza dónde auditar el acta física.")
+        summary = (f"Hay una señal de dígitos que vale revisar: {names}"
+                   + (f", más {impossible['count']} mesa(s) con números que no cuadran." if integrity_breach else ".")
+                   + " Que falle no prueba fraude; solo dice qué acta física conviene auditar.")
 
     return {
         "level": "mesa",
@@ -177,7 +177,7 @@ def analyze(scan: dict[str, Any]) -> dict[str, Any]:
         "participation": participation,
         "estados": estados,
         "overall": {"verdict": verdict, "summary": summary},
-        "disclaimer": ("Forense profundo de muestreo a nivel mesa. Alta potencia estadística, "
-                       "pero sigue siendo un TAMIZ: ninguna señal prueba fraude por sí sola. "
-                       "La validez legal de las actas compete al JNE."),
+        "disclaimer": ("Es un análisis mesa por mesa sobre una muestra. Tiene mucha potencia, "
+                       "pero sigue siendo un tamiz: ninguna señal acusa fraude sola. Quien valida "
+                       "las actas es el JNE."),
     }

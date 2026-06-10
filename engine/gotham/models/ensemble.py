@@ -50,26 +50,28 @@ def _decision(p_win_leader: float, cf_ci: list[float], bounds_straddle: bool,
     # — INDECIDIBLE: la evidencia real no separa a los candidatos —
     if ext_pct < 80.0 and margin_pct_abs < 0.5:
         return "INDECIDIBLE", (
-            f"El exterior está {ext_pct:.0f}% contado (pool grande, pro-Keiko) y el margen "
-            f"proyectado es {margin_pct_abs:.2f}pp: pivota en data que aún no existe.")
+            f"El exterior recién va {ext_pct:.0f}% y el margen es de apenas {margin_pct_abs:.2f}pp. "
+            f"El resultado depende de votos que todavía no se cuentan.")
     if flips_within_plausible or cf_crosses or p_win_leader < 0.80:
         return "INDECIDIBLE", (
-            f"P({leader_name})={p_win_leader:.0%}, pero el IC90 del margen cruza cero "
-            f"y/o el líder cambia dentro de la deriva plausible (±1.5pp). Empate estadístico.")
+            f"P({leader_name})={p_win_leader:.0%}, pero el intervalo del margen todavía toca el "
+            f"cero y el líder cambia con una deriva de ±1.5pp. Está demasiado cerca para llamarlo.")
 
     # — DECIDIDO: P alta, IC90 sin cruzar, robusto, y el conteo ya cerró el margen —
     closed = counted_pct >= 99.5 or margin_pct_abs >= 1.0
     if p_win_leader >= 0.95 and closed:
         return "DECIDIDO", (
-            f"P({leader_name})={p_win_leader:.0%}, IC90 sin cruzar cero, robusto a ±1.5pp de "
-            f"deriva y con {counted_pct:.1f}% de actas contabilizadas.")
+            f"Gana {leader_name} (P={p_win_leader:.0%}). El intervalo no toca el cero, aguanta una "
+            f"deriva de ±1.5pp y ya hay {counted_pct:.1f}% de actas. El resultado está cerrado.")
 
     # — INCLINADO: favorito claro y robusto, pero el margen es fino y aún falta cerrar —
-    note = (f"margen {margin_pct_abs:.2f}pp con {counted_pct:.1f}% contado aún puede moverse"
-            if margin_pct_abs < 1.0 else f"{counted_pct:.1f}% contado, falta cerrar")
+    if margin_pct_abs < 1.0:
+        note = (f"el margen es de solo {margin_pct_abs:.2f}pp y con {counted_pct:.1f}% contado "
+                f"todavía se puede mover")
+    else:
+        note = f"falta cerrar el conteo ({counted_pct:.1f}% de actas)"
     return "INCLINADO", (
-        f"P({leader_name})={p_win_leader:.0%}: {leader_name} favorito claro y robusto a la "
-        f"deriva, pero {note}; no alcanza el umbral de cierre.")
+        f"{leader_name} es favorito (P={p_win_leader:.0%}) y aguanta la deriva, pero {note}.")
 
 
 def evaluate(snap: Snapshot) -> dict:

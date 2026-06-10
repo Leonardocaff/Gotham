@@ -15,7 +15,7 @@ export function ForensicIntegrity({ latest }: { latest: Latest }) {
   return (
     <Panel
       title="Forense · integridad del conteo"
-      hint="Tamices estadísticos de anomalía sobre los datos publicados — no prueban fraude, señalan dónde mirar"
+      hint="Pruebas estadísticas para detectar anomalías. No prueban fraude; señalan dónde mirar."
       aside={<VerdictChip verdict={clean ? "NORMAL" : "ATENCION"} label={overall.verdict} />}
     >
       {/* Síntesis honesta */}
@@ -33,11 +33,10 @@ export function ForensicIntegrity({ latest }: { latest: Latest }) {
 
       {/* Rumor-check: el universo de actas es fijo y pequeño */}
       <p className="mt-2.5 rounded-md border border-edge bg-surface-3/40 px-2.5 py-2 text-[10px] leading-snug text-ink-3">
-        Universo fijo de{" "}
+        El país tiene{" "}
         <span className="tnum font-mono text-ink-1">{int(ledger.totalActas)}</span>{" "}
-        actas. Cifras que circulan como “900 mil actas” exceden ~10× el total
-        nacional: no corresponden a ninguna magnitud real del proceso. Lo
-        legalmente en disputa son{" "}
+        actas en total, y ese número no cambia. Cifras como “900 mil actas” son
+        más de 10 veces eso: no existen. Lo que de verdad está en disputa son{" "}
         <span className="tnum font-mono" style={{ color: "#FFB43C" }}>
           {int(ledger.observedActas)}
         </span>{" "}
@@ -45,7 +44,7 @@ export function ForensicIntegrity({ latest }: { latest: Latest }) {
         <span className="tnum font-mono text-ink-2">
           {int(ledger.observedVotesEst)}
         </span>{" "}
-        votos est.).
+        votos).
       </p>
 
       {/* Pool en disputa vs margen actual */}
@@ -56,21 +55,21 @@ export function ForensicIntegrity({ latest }: { latest: Latest }) {
       <p className="mt-1.5 text-[10px] leading-snug text-ink-3">
         {ledger.poolCanFlip ? (
           <>
-            El pool en disputa{" "}
-            <span className="text-ink-2">supera</span> al margen actual: bastaría
-            un swing neto del{" "}
+            Los votos en disputa{" "}
+            <span className="text-ink-2">superan</span> al margen actual: con que
+            se reasigne el{" "}
             <span className="tnum font-mono" style={{ color: "#FFB43C" }}>
               {ledger.swingNeededFrac !== null
                 ? pct(ledger.swingNeededFrac * 100, 1)
                 : "—"}
             </span>{" "}
-            del pool para empatar. Por eso el veredicto no es “decidido” — es
-            incertidumbre legal, no señal de fraude.
+            de ellos ya hay empate. Por eso el veredicto no es “decidido”: es una
+            duda legal, no una señal de fraude.
           </>
         ) : (
           <>
-            El pool en disputa es <span className="text-ink-2">menor</span> que el
-            margen: aun anulándose por completo, no revierte el resultado.
+            Los votos en disputa son <span className="text-ink-2">menos</span> que
+            el margen: aunque se anularan todos, no cambian el resultado.
           </>
         )}
       </p>

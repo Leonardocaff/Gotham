@@ -45,7 +45,7 @@ export function DeepForensics({ data }: { data: DeepForensicsData | null }) {
   return (
     <Panel
       title="Forense profundo · nivel mesa"
-      hint={`Muestra de ${int(meta.mesasFetched)} mesas (conteos crudos) en ${meta.districtsSampled} distritos · ${meta.departmentsCovered} deptos — alta potencia estadística`}
+      hint={`Análisis mesa por mesa: ${int(meta.mesasFetched)} mesas en ${meta.districtsSampled} distritos de ${meta.departmentsCovered} departamentos`}
       aside={<VerdictChip verdict={clean ? "NORMAL" : "ATENCION"} label={overall.verdict} />}
     >
       <p className="text-[11px] leading-snug text-ink-2">{overall.summary}</p>
@@ -75,10 +75,11 @@ export function DeepForensics({ data }: { data: DeepForensicsData | null }) {
           <Stat label="Revisadas">{int(impossible.checked)}</Stat>
         </div>
         <p className="mt-1.5 text-[10px] leading-snug text-ink-3">
-          Votos o asistentes que exceden el padrón, o válidos &gt; emitidos.{" "}
+          Mesas con más votos o asistentes que electores, o con más válidos que
+          emitidos.{" "}
           {impossible.count === 0
-            ? "Ninguna en la muestra — la aritmética de cada acta cierra."
-            : "Probables errores de digitación; ameritan revisar el acta física."}
+            ? "Ninguna en la muestra: los números de cada acta cuadran."
+            : "Casi siempre son errores de tipeo, pero conviene revisar el acta física."}
         </p>
       </div>
 
@@ -103,9 +104,9 @@ export function DeepForensics({ data }: { data: DeepForensicsData | null }) {
             </Stat>
           </div>
           <p className="mt-1.5 text-[10px] leading-snug text-ink-3">
-            Descriptivo. En zonas rurales homogéneas, alta participación con fuerte
-            ventaja de un candidato es <span className="text-ink-2">normal</span>, no
-            señal de fraude — por eso no entra al veredicto.
+            Es solo referencia. En pueblos chicos y parejos, una participación
+            alta con un candidato muy adelante es <span className="text-ink-2">normal</span>;
+            por eso no pesa en el veredicto.
           </p>
         </div>
       )}
