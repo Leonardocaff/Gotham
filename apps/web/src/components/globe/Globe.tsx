@@ -22,6 +22,13 @@ import { leaderColor } from "@/lib/color";
 
 const TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN ?? "";
 
+// The console frames Peru. We start close — the country fills the frame while
+// the curvature + stars still read — and hold there rather than spinning the
+// planet (a full longitude spin would carry Peru out of view, defeating the
+// zoom). A whisper-slow drift gently re-settles the camera on Peru until the
+// user takes over with drag / pinch.
+const INITIAL_ZOOM = 3.5;
+
 // A department is "contested" when its split is within this band of 50/50. Its
 // centroid gets a pulsing halo so toss-ups stand out on the planet.
 const CONTESTED_BAND_PP = 6;
@@ -152,8 +159,10 @@ export default function Globe({
         container: containerRef.current,
         style: "mapbox://styles/mapbox/dark-v11",
         projection: { name: "globe" },
+        // Framed on Peru, zoomed in ~200% over the old 2.4 (each +1 doubles the
+        // apparent scale). Peru fills the frame; the globe edge + space stay.
         center: PERU_CENTER,
-        zoom: 2.4,
+        zoom: INITIAL_ZOOM,
         pitch: 0,
         attributionControl: false,
         antialias: true,
@@ -173,17 +182,23 @@ export default function Globe({
     map.on("error", (ev) => console.warn("Globe: Mapbox error", ev?.error));
     mapRef.current = map;
 
-    const stopSpin = () => {
+    // Any direct interaction permanently hands the camera to the user — we stop
+    // the gentle recentering drift so we never fight their drag/pinch.
+    const stopDrift = () => {
       interactedRef.current = true;
       if (spinRef.current) {
         cancelAnimationFrame(spinRef.current);
         spinRef.current = null;
       }
     };
-    map.on("mousedown", stopSpin);
-    map.on("touchstart", stopSpin);
-    map.on("wheel", stopSpin);
-    map.on("dragstart", stopSpin);
+    map.on("mousedown", stopDrift);
+    map.on("touchstart", stopDrift);
+    map.on("wheel", stopDrift);
+    map.on("dragstart", stopDrift);
+
+    const reduce =
+      typeof window !== "undefined" &&
+      window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
 
     map.on("style.load", () => {
       // Deeper "planet in space" atmosphere: near-black space, a soft cool
@@ -198,18 +213,33 @@ export default function Globe({
       });
       setReady(true);
 
-      // subtle auto-rotate until interaction
+      // No continuous spin — that would rotate Peru out of frame. Instead a
+      // very slow drift that eases the camera back toward PERU_CENTER, so the
+      // planet always reads as "focused on Peru". It dies once it's settled or
+      // the user interacts. Reduced-motion skips it entirely (camera is already
+      // on Peru from init).
+      if (reduce) return;
       let last = performance.now();
-      const spin = (now: number) => {
+      const drift = (now: number) => {
         if (interactedRef.current) return;
-        const dt = now - last;
+        const dt = Math.min(now - last, 48);
         last = now;
         const c = map.getCenter();
-        c.lng -= dt * 0.0016;
+        const dLng = PERU_CENTER[0] - c.lng;
+        const dLat = PERU_CENTER[1] - c.lat;
+        // Settled? stop the loop — nothing to animate, no idle frames burned.
+        if (Math.abs(dLng) < 0.01 && Math.abs(dLat) < 0.01) {
+          spinRef.current = null;
+          return;
+        }
+        // Critically-damped-ish ease: move a small fraction of the gap / frame.
+        const k = 1 - Math.pow(0.0016, dt / 1000);
+        c.lng += dLng * k;
+        c.lat += dLat * k;
         map.setCenter(c);
-        spinRef.current = requestAnimationFrame(spin);
+        spinRef.current = requestAnimationFrame(drift);
       };
-      spinRef.current = requestAnimationFrame(spin);
+      spinRef.current = requestAnimationFrame(drift);
     });
 
     // Keep the canvas correctly sized on orientation change / container reflow.

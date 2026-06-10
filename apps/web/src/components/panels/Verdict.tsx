@@ -2,7 +2,7 @@
 
 import type { Decision, Latest } from "@/lib/types";
 import { CANDIDATE_COLOR } from "@/lib/types";
-import { pct } from "@/lib/format";
+import { int, pct, signedInt, signedPp } from "@/lib/format";
 import { LiveNum } from "@/components/ui/atoms";
 
 function decisionColor(d: Decision, leaderColor: string): string {
@@ -65,6 +65,10 @@ export function Verdict({
   const { projection } = latest;
   const leaderColor = CANDIDATE_COLOR[projection.leader];
   const dColor = decisionColor(projection.decision, leaderColor);
+  const marginVotes = projection.final_margin.median_votes;
+  const marginColor = marginVotes >= 0 ? CANDIDATE_COLOR.sanchez : CANDIDATE_COLOR.keiko;
+  const [mLo, mHi] = projection.final_margin.ci90_votes;
+  const crossesZero = projection.bounds.straddles_zero;
 
   return (
     <section
@@ -129,16 +133,45 @@ export function Verdict({
         />
       </div>
 
-      <div className="flex items-center justify-center gap-2 text-[11px] text-ink-3">
-        <span>Final proyectado</span>
-        <span className="tnum font-mono text-ink-2">
-          {pct(projection.final_pct.sanchez.median, 2)}
-        </span>
-        <span className="text-ink-3">·</span>
-        <span className="tnum font-mono text-ink-2">
-          {pct(projection.final_pct.keiko.median, 2)}
-        </span>
-      </div>
+      {/* Projected margin + final split — the substance behind the verdict. */}
+      {!compact && (
+        <div className="grid grid-cols-2 gap-3 border-t border-edge pt-4">
+          <div className="rounded-lg border border-edge bg-surface-3 px-3 py-2.5">
+            <div className="text-[10px] uppercase tracking-[0.14em] text-ink-3">
+              Margen proyectado
+            </div>
+            <div
+              className="tnum mt-1 font-mono text-lg font-semibold leading-none"
+              style={{ color: marginColor }}
+            >
+              {signedInt(marginVotes)}
+            </div>
+            <div className="tnum mt-1 font-mono text-[10px] text-ink-3">
+              IC90 [{int(mLo)} … {int(mHi)}] · {signedPp(projection.final_margin.median_pct)}
+            </div>
+          </div>
+          <div className="rounded-lg border border-edge bg-surface-3 px-3 py-2.5">
+            <div className="text-[10px] uppercase tracking-[0.14em] text-ink-3">
+              Final % (válidos)
+            </div>
+            <div className="tnum mt-1 flex items-baseline gap-2 font-mono text-lg font-semibold leading-none">
+              <span style={{ color: CANDIDATE_COLOR.sanchez }}>
+                {pct(projection.final_pct.sanchez.median, 1)}
+              </span>
+              <span className="text-[11px] font-normal text-ink-3">·</span>
+              <span style={{ color: CANDIDATE_COLOR.keiko }}>
+                {pct(projection.final_pct.keiko.median, 1)}
+              </span>
+            </div>
+            <div
+              className="mt-1 text-[10px]"
+              style={{ color: crossesZero ? "#FF7A8A" : "#909092" }}
+            >
+              {crossesZero ? "el IC del margen cruza el cero" : "IC del margen no cruza cero"}
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 }

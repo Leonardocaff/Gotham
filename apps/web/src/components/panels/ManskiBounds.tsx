@@ -2,12 +2,15 @@
 
 import type { Latest } from "@/lib/types";
 import { CANDIDATE_COLOR } from "@/lib/types";
-import { signedInt } from "@/lib/format";
+import { int, signedInt } from "@/lib/format";
 import { Panel } from "@/components/ui/Panel";
 
 export function ManskiBounds({ latest }: { latest: Latest }) {
   const [lo, hi] = latest.projection.bounds.margin_votes;
   const median = latest.projection.final_margin.median_votes;
+  const crossesZero = latest.projection.bounds.straddles_zero;
+  // Half-width of the bound = the still-undetermined pool that can swing either way.
+  const undetermined = Math.round((hi - lo) / 2);
 
   // symmetric scale around zero
   const extent = Math.max(Math.abs(lo), Math.abs(hi)) * 1.08;
@@ -21,6 +24,18 @@ export function ManskiBounds({ latest }: { latest: Latest }) {
     <Panel
       title="Cotas de Manski"
       hint="Rango de no-identificación del margen, sin supuestos de deriva"
+      aside={
+        <span
+          className="rounded-md border px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide"
+          style={
+            crossesZero
+              ? { color: "#FF7A8A", borderColor: "#FF7A8A55", background: "#FF7A8A14" }
+              : { color: "#3DD9A0", borderColor: "#3DD9A055", background: "#3DD9A014" }
+          }
+        >
+          {crossesZero ? "abierto" : "cerrado"}
+        </span>
+      }
     >
       <div className="relative h-16 w-full">
         {/* baseline */}
@@ -70,11 +85,49 @@ export function ManskiBounds({ latest }: { latest: Latest }) {
           {signedInt(hi)}
         </span>
       </div>
-      <p className="mt-2 text-[11px] leading-snug text-ink-3">
-        El intervalo{" "}
-        <span className="text-accent-rose">cruza el cero</span> — sin imponer un
-        modelo de deriva, el resultado es{" "}
-        <span className="text-ink-2">matemáticamente abierto</span>.
+
+      {/* Quantified endpoints — the worst case for each side + the model's point. */}
+      <div className="mt-3 grid grid-cols-3 gap-2">
+        <div className="rounded-lg border border-edge bg-surface-3 px-2 py-1.5">
+          <div className="text-[9px] uppercase tracking-[0.12em] text-ink-3">
+            Piso (todo Keiko)
+          </div>
+          <div className="tnum font-mono text-xs" style={{ color: CANDIDATE_COLOR.keiko }}>
+            {signedInt(lo)}
+          </div>
+        </div>
+        <div className="rounded-lg border border-edge bg-surface-3 px-2 py-1.5 text-center">
+          <div className="text-[9px] uppercase tracking-[0.12em] text-ink-3">
+            Mediana
+          </div>
+          <div
+            className="tnum font-mono text-xs"
+            style={{ color: median >= 0 ? CANDIDATE_COLOR.sanchez : CANDIDATE_COLOR.keiko }}
+          >
+            {signedInt(median)}
+          </div>
+        </div>
+        <div className="rounded-lg border border-edge bg-surface-3 px-2 py-1.5 text-right">
+          <div className="text-[9px] uppercase tracking-[0.12em] text-ink-3">
+            Techo (todo Sánchez)
+          </div>
+          <div className="tnum font-mono text-xs" style={{ color: CANDIDATE_COLOR.sanchez }}>
+            {signedInt(hi)}
+          </div>
+        </div>
+      </div>
+
+      <p className="mt-3 text-[11px] leading-snug text-ink-3">
+        ~<span className="tnum font-mono text-ink-2">{int(undetermined)}</span> votos
+        del restante aún pueden ir a cualquier lado. El intervalo{" "}
+        <span style={{ color: crossesZero ? "#FF7A8A" : "#909092" }}>
+          {crossesZero ? "cruza el cero" : "no cruza el cero"}
+        </span>{" "}
+        — sin imponer un modelo de deriva, el resultado es{" "}
+        <span className="text-ink-2">
+          {crossesZero ? "matemáticamente abierto" : "matemáticamente cerrado"}
+        </span>
+        .
       </p>
     </Panel>
   );

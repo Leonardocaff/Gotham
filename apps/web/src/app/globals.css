@@ -153,6 +153,41 @@ body::after {
     inset 0 1px 0 0 rgba(255, 255, 255, 0.06);
 }
 
+/* ── Right intelligence strip ──────────────────────────────────────────────
+ * The always-visible feed column beside the planet. A faint glass tint over
+ * the canvas with a soft gradient down its inner edge so it reads as a panel
+ * lifted off the globe — calm, dark, dense. The hairline left divider is on
+ * the element itself (lg:border-l) so it only separates on desktop.
+ */
+.strip {
+  background:
+    linear-gradient(
+      to left,
+      rgba(14, 14, 18, 0.9),
+      rgba(12, 12, 16, 0.82) 55%,
+      rgba(10, 10, 13, 0.68)
+    );
+  backdrop-filter: blur(24px) saturate(160%);
+  -webkit-backdrop-filter: blur(24px) saturate(160%);
+  box-shadow: inset 1px 0 0 0 rgba(255, 255, 255, 0.04);
+}
+/* Inside the strip, the hover-lift must not scale horizontally — the column is
+ * narrow with its own scroll, so a 1% width gain could nudge a hairline of
+ * sideways overflow. Lift vertically only here. */
+.strip .lift:hover {
+  transform: translateY(-3px);
+}
+/* On phones the strip IS the page body below the globe — drop its tint, edge
+ * and blur so the deep-space canvas shows through and the page scrolls plainly. */
+@media (max-width: 1023px) {
+  .strip {
+    background: transparent;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    box-shadow: none;
+  }
+}
+
 /* ── Translucent command modal ─────────────────────────────────────────────
  * Glassmorphism taken further than the cards: deeper blur, near-translucent
  * dark fill so the planet still reads behind the scrim, hairline border, a
@@ -302,6 +337,9 @@ body::after {
     animation: none;
   }
   .lift:hover {
+    transform: none;
+  }
+  .strip .lift:hover {
     transform: none;
   }
   .animate-modalIn,
