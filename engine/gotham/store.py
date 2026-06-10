@@ -114,8 +114,8 @@ def build_contract(snap: Snapshot, result: dict) -> dict:
             "pct": round(abs(snap.pct_sanchez - snap.pct_keiko), 3),
         },
         "projection": {k: result[k] for k in
-                       ("leader", "p_win", "final_pct", "final_margin", "sd_components",
-                        "bounds", "sensitivity", "exterior", "contested",
+                       ("leader", "p_win", "final_votes", "final_pct", "final_margin",
+                        "sd_components", "bounds", "sensitivity", "exterior", "contested",
                         "decision", "decision_reason")},
         "models": result["models"],
         "strata": _departments(snap),

@@ -66,9 +66,17 @@ def closed_form(snap: Snapshot, delta_mean: float = 0.0, sigma_delta: float = SI
 
     p_win_s = float(norm.cdf(margin_mean / margin_sd)) if margin_sd > 0 else float(margin_mean > 0)
     z = 1.6448536269514722  # 90%
+    keiko_final_mean = total - final_s_mean
     return {
         "remaining_total": M,
         "p_win": {"sanchez": p_win_s, "keiko": 1.0 - p_win_s},
+        "final_votes": {
+            "sanchez": {"median": final_s_mean,
+                        "ci90": [final_s_mean - z * sd_rem, final_s_mean + z * sd_rem]},
+            "keiko": {"median": keiko_final_mean,
+                      "ci90": [keiko_final_mean - z * sd_rem, keiko_final_mean + z * sd_rem]},
+            "total": total,
+        },
         "final_pct_sanchez": {
             "median": pct_s_mean,
             "ci90": [pct_s_mean - z * 100 * sd_rem / total, pct_s_mean + z * 100 * sd_rem / total],

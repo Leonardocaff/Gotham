@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-10T01:25:43.795386+00:00",
+  "generatedAt": "2026-06-10T01:28:03.273246+00:00",
   "source": {
     "idEleccion": 10,
     "portal": "resultadosegundavuelta.onpe.gob.pe",
@@ -43,6 +43,23 @@
     "p_win": {
       "sanchez": 0.1065,
       "keiko": 0.8935
+    },
+    "final_votes": {
+      "sanchez": {
+        "median": 9190077,
+        "ci90": [
+          9164946,
+          9215207
+        ]
+      },
+      "keiko": {
+        "median": 9228134,
+        "ci90": [
+          9203004,
+          9253265
+        ]
+      },
+      "total": 18418211
     },
     "final_pct": {
       "sanchez": {

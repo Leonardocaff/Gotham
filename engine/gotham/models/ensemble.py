@@ -90,9 +90,17 @@ def evaluate(snap: Snapshot) -> dict:
          "final_margin_votes": round(mc["margin_median"])},
     ]
 
+    fv = cf["final_votes"]
     return {
         "leader": leader,
         "p_win": {k: round(v, 4) for k, v in cf["p_win"].items()},
+        "final_votes": {
+            "sanchez": {"median": round(fv["sanchez"]["median"]),
+                        "ci90": [round(x) for x in fv["sanchez"]["ci90"]]},
+            "keiko": {"median": round(fv["keiko"]["median"]),
+                      "ci90": [round(x) for x in fv["keiko"]["ci90"]]},
+            "total": round(fv["total"]),
+        },
         "final_pct": {
             "sanchez": {"median": round(cf["final_pct_sanchez"]["median"], 3),
                         "ci90": [round(x, 3) for x in cf["final_pct_sanchez"]["ci90"]]},
