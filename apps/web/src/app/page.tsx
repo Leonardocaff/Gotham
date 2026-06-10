@@ -7,7 +7,7 @@ import type { GlobeSelection } from "@/components/globe/Globe";
 import { DrillDown } from "@/components/globe/DrillDown";
 import { Header } from "@/components/panels/Header";
 import { Verdict } from "@/components/panels/Verdict";
-import { FinalVotesHero } from "@/components/panels/FinalVotesHero";
+import { FinalVotesHero, FinalVotesChip } from "@/components/panels/FinalVotesHero";
 import { NowVsProjection } from "@/components/panels/NowVsProjection";
 import { Uncertainty } from "@/components/panels/Uncertainty";
 import { Methods } from "@/components/panels/Methods";
@@ -89,12 +89,15 @@ export default function Page() {
       <Header latest={latest} />
 
       {/* ── Cinematic globe hero ───────────────────────────────────────────
-       * The planet is the immersive stage. On desktop EXACTLY TWO hero cards
-       * float over it: the Verdict in the upper-right corner, and the wide
-       * FinalVotes readout anchored across the globe's base. The planet keeps
-       * clear "breathing" space between them. On phones the HUD collapses to a
-       * single status chip and both heroes drop OUT of the overlay to stack as
-       * full-width cards directly below the globe.
+       * The planet is the immersive stage and it stays CLEAR. Only lightweight
+       * HUD chips float over it, all anchored to the globe container with safe
+       * positive insets so nothing escapes the centred column:
+       *   · live-status chip      top-left
+       *   · candidate legend      bottom-left (fully visible)
+       *   · Verdict glass HUD     top-right (compact)
+       *   · FinalVotes summary    bottom-centre (slim, two totals + leader)
+       * The FULL FinalVotes readout lives in its own full-width row directly
+       * BELOW the globe — never overlapping it.
        */}
       <section className="relative mt-6">
         {/* ambient glow pooled behind the planet */}
@@ -106,10 +109,10 @@ export default function Page() {
           }}
         />
 
-        {/* Globe stage. Taller on desktop so two cards can float with the planet
-            still reading clearly between them; shorter on phones (~50vh) so it
-            doesn't eat the first screen. */}
-        <div className="relative h-[50vh] min-h-[340px] sm:h-[64vh] sm:min-h-[480px] lg:h-[78vh] lg:min-h-[620px]">
+        {/* Globe stage. ~50vh on phones so it doesn't eat the first screen;
+            taller on desktop for an immersive planet. Now that no giant card
+            covers the base, the planet reads clearly edge to edge. */}
+        <div className="relative h-[50vh] min-h-[340px] overflow-hidden sm:h-[60vh] sm:min-h-[460px] lg:h-[68vh] lg:min-h-[560px]">
           <Globe
             strata={latest.strata}
             continents={latest.exteriorByContinent}
@@ -117,9 +120,8 @@ export default function Page() {
             onSelect={setSelection}
           />
 
-          {/* HUD: live status / actas — top-left. The minimal chip we always
-              keep over the globe. */}
-          <div className="hud-card lift animate-fadeUp pointer-events-auto absolute left-3 top-3 z-20 flex items-center gap-2.5 px-3 py-2 sm:left-5 sm:top-5 sm:gap-3 sm:px-3.5 sm:py-2.5">
+          {/* HUD: live status / actas — top-left chip we always keep. */}
+          <div className="hud-card lift animate-fadeUp pointer-events-auto absolute left-3 top-3 z-20 flex items-center gap-2.5 px-3 py-2 sm:left-4 sm:top-4 sm:gap-3 sm:px-3.5 sm:py-2.5">
             <span className="h-2 w-2 animate-pulseDot rounded-full bg-accent-rose shadow-[0_0_10px_#FF7A8A]" />
             <div className="leading-tight">
               <div className="text-[9px] uppercase tracking-[0.16em] text-ink-3">
@@ -131,15 +133,14 @@ export default function Page() {
             </div>
           </div>
 
-          {/* HERO 1 — Verdict: floats top-right over the globe (desktop only;
+          {/* Verdict: compact glass HUD floating top-right (desktop only;
               mobile gets a full-width card stacked below the globe). */}
-          <div className="hero-float-tr animate-fadeUp absolute right-3 top-3 z-30 hidden lg:block">
+          <div className="animate-fadeUp absolute right-3 top-3 z-30 hidden max-w-[calc(100%-1.5rem)] lg:right-4 lg:top-4 lg:block">
             <Verdict latest={latest} compact />
           </div>
 
-          {/* Legend — bottom-left, desktop only. Tucked above the anchored votes
-              bar so it doesn't collide with it. */}
-          <div className="hud-card pointer-events-none absolute bottom-[34%] left-3 z-20 hidden items-center gap-3 px-3 py-1.5 text-[10px] sm:bottom-5 lg:bottom-[40%] lg:left-5 lg:flex">
+          {/* Legend — bottom-left, desktop only, fully visible. */}
+          <div className="hud-card pointer-events-none absolute bottom-3 left-3 z-20 hidden items-center gap-3 px-3 py-1.5 text-[10px] sm:left-4 lg:flex">
             <span className="flex items-center gap-1.5">
               <span className="h-2 w-2 rounded-full bg-accent-emerald" /> Sánchez
             </span>
@@ -149,17 +150,16 @@ export default function Page() {
             <span className="text-ink-3">intensidad = margen</span>
           </div>
 
-          {/* HERO 2 — FinalVotes: the headline. Anchored as a wide readout bar
-              across the lower band of the globe on desktop. Centred and padded
-              so the planet still breathes on either side. Desktop-only here;
-              mobile renders it below the globe in the stack. */}
-          <div className="hero-anchor animate-fadeUp pointer-events-auto absolute inset-x-4 bottom-4 z-30 mx-auto hidden max-w-[1080px] lg:block xl:inset-x-10">
-            <FinalVotesHero latest={latest} hud />
+          {/* FinalVotes slim summary chip — bottom-centre, desktop only.
+              Two projected totals + leader. Contained, lets the planet breathe.
+              The full detailed readout renders below the globe. */}
+          <div className="animate-fadeUp pointer-events-auto absolute bottom-3 left-1/2 z-30 hidden -translate-x-1/2 lg:block">
+            <FinalVotesChip latest={latest} />
           </div>
 
           {/* Drill-down: phones → bottom sheet; desktop → floats top-right,
               pushed below the Verdict hero via the offset wrapper. */}
-          <div className="lg:[&>*]:!top-[250px]">
+          <div className="lg:[&>*]:!top-[240px]">
             <DrillDown selection={selection} onClose={() => setSelection(null)} />
           </div>
         </div>
@@ -176,12 +176,16 @@ export default function Page() {
         </div>
       </section>
 
-      {/* ── Mobile / tablet hero stack ─────────────────────────────────────
-       * Below the globe the two protagonists stack full-width: FinalVotes
-       * (the headline) then Verdict. Hidden on desktop, where both float over
-       * the globe instead. */}
-      <div className="mt-5 grid grid-cols-1 gap-4 lg:hidden">
+      {/* ── FinalVotes — the headline, full-width row directly below the globe.
+       * Its large numbers, head-to-head bar and 4-stat footer get proper room
+       * here, on every breakpoint, with zero overlap of the planet above. */}
+      <div className="mt-5">
         <FinalVotesHero latest={latest} />
+      </div>
+
+      {/* Verdict full card — mobile/tablet only (desktop has the compact HUD
+       * floating over the globe). */}
+      <div className="mt-4 lg:hidden">
         <Verdict latest={latest} />
       </div>
 

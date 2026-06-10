@@ -62,7 +62,7 @@ function Counter({
       </span>
 
       <span
-        className={`tnum mt-3 max-w-full truncate font-mono text-[1.7rem] font-semibold leading-none tracking-tight sm:text-5xl lg:text-[3.4rem] ${
+        className={`tnum mt-3 max-w-full truncate font-mono text-[2rem] font-semibold leading-none tracking-tight sm:text-5xl lg:text-[3.4rem] ${
           flash ? "animate-flash" : ""
         }`}
         style={{
@@ -177,16 +177,7 @@ function HeadToHeadBar({
   );
 }
 
-export function FinalVotesHero({
-  latest,
-  hud = false,
-}: {
-  latest: Latest;
-  /** HUD mode: stronger glass tint + tighter rhythm so it reads while floating
-   * anchored over the dark globe. Default (false) is the standalone card used
-   * in the mobile stack. */
-  hud?: boolean;
-}) {
+export function FinalVotesHero({ latest }: { latest: Latest }) {
   const { projection, candidates } = latest;
   const fv = projection.final_votes;
   const [sCand, kCand] = candidates;
@@ -209,11 +200,7 @@ export function FinalVotesHero({
   const leadVotes = Math.abs(marginVotes);
 
   return (
-    <section
-      className={`lift animate-fadeUp relative overflow-hidden ${
-        hud ? "hud-card p-4 sm:p-5 lg:px-7 lg:py-5" : "glass p-5 sm:p-7"
-      }`}
-    >
+    <section className="glass lift animate-fadeUp relative overflow-hidden p-5 sm:p-7">
       {/* ambient leader glow */}
       <div
         className="pointer-events-none absolute -top-24 h-48 w-48 rounded-full opacity-30 blur-3xl"
@@ -329,5 +316,70 @@ export function FinalVotesHero({
         </div>
       </div>
     </section>
+  );
+}
+
+/**
+ * Slim summary chip that floats over the globe (desktop only). Shows just the
+ * two projected totals + the leader badge — enough to read the headline at a
+ * glance without burying the planet. The full detailed readout lives in the
+ * card below the globe. Fully contained: fixed max width, no transforms.
+ */
+export function FinalVotesChip({ latest }: { latest: Latest }) {
+  const { projection } = latest;
+  const fv = projection.final_votes;
+  const leaderColor = CANDIDATE_COLOR[projection.leader];
+  const leaderName = projection.leader === "sanchez" ? "Sánchez" : "Keiko";
+
+  return (
+    <div className="hud-card flex items-center gap-4 px-4 py-2.5">
+      <div className="flex flex-col items-start text-left">
+        <span className="flex items-center gap-1.5 text-[9px] uppercase tracking-[0.14em] text-ink-3">
+          <span
+            className="h-1.5 w-1.5 rounded-full"
+            style={{ backgroundColor: EMERALD }}
+          />
+          Sánchez
+        </span>
+        <span
+          className="tnum font-mono text-lg font-semibold leading-none"
+          style={{ color: EMERALD }}
+        >
+          {int(fv.sanchez.median)}
+        </span>
+      </div>
+
+      <div className="h-8 w-px bg-edge-strong" />
+
+      <div className="flex flex-col items-end text-right">
+        <span className="flex items-center gap-1.5 text-[9px] uppercase tracking-[0.14em] text-ink-3">
+          Keiko
+          <span
+            className="h-1.5 w-1.5 rounded-full"
+            style={{ backgroundColor: CYAN }}
+          />
+        </span>
+        <span
+          className="tnum font-mono text-lg font-semibold leading-none"
+          style={{ color: CYAN }}
+        >
+          {int(fv.keiko.median)}
+        </span>
+      </div>
+
+      <div className="h-8 w-px bg-edge-strong" />
+
+      <div className="flex flex-col items-start">
+        <span className="text-[9px] uppercase tracking-[0.14em] text-ink-3">
+          Proyección · líder
+        </span>
+        <span
+          className="text-sm font-semibold leading-none"
+          style={{ color: leaderColor }}
+        >
+          {leaderName}
+        </span>
+      </div>
+    </div>
   );
 }
