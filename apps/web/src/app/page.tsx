@@ -134,6 +134,7 @@ export default function Page() {
           <Globe
             strata={latest.strata}
             continents={latest.exteriorByContinent}
+            countries={latest.exteriorByCountry ?? []}
             selection={selection}
             onSelect={onGlobeSelect}
           />
@@ -203,7 +204,7 @@ export default function Page() {
             geo drill is open to keep the stage calm. ── */}
         {!geoOpen && (
           <div className="pointer-events-none absolute inset-x-0 bottom-7 z-20 hidden justify-center lg:flex">
-            <div className="hud-card flex items-center gap-3.5 px-4 py-2 text-[11px]">
+            <div className="hud-card flex items-center gap-3 px-4 py-2 text-[11px]">
               <span className="flex items-center gap-1.5">
                 <span className="h-2 w-2 rounded-full bg-accent-emerald" /> Sánchez
               </span>
@@ -212,6 +213,12 @@ export default function Page() {
               </span>
               <span className="flex items-center gap-1.5">
                 <span className="h-2 w-2 rounded-full bg-accent-rose" /> reñido
+              </span>
+              <span className="h-3 w-px bg-edge-strong" />
+              <span className="flex items-center gap-1.5 text-ink-3">
+                <span className="h-2 w-2 rounded-full" style={{ background: "#FFA53C" }} />
+                <span className="h-2 w-2 rounded-full" style={{ background: "#FF5C5C" }} />
+                exterior
               </span>
             </div>
           </div>
@@ -235,19 +242,31 @@ export default function Page() {
           </div>
         )}
 
-        {/* ── Exterior card — opened by clicking a continent marker on the globe.
-            Same float position as the geo drill so the stage stays consistent. ── */}
-        {selection?.kind === "continent" && (
-          <div className="pointer-events-none absolute inset-0 z-40">
-            <div className="pointer-events-auto absolute inset-x-3 top-16 max-h-[calc(54vh-5rem)] overflow-y-auto sm:top-20 lg:inset-x-auto lg:right-4 lg:top-1/2 lg:max-h-[78vh] lg:w-[360px] lg:-translate-y-1/2">
-              <ContinentCard
-                continent={selection.data}
-                latest={latest}
-                onClose={onExplorerClose}
-              />
-            </div>
-          </div>
-        )}
+        {/* ── Exterior card — opened by clicking a continent OR a country marker on
+            the globe. Same float position as the geo drill. A country click opens
+            the card pre-drilled into that country. ── */}
+        {(selection?.kind === "continent" || selection?.kind === "country") &&
+          (() => {
+            const cont =
+              selection.kind === "continent"
+                ? selection.data
+                : latest.exteriorByContinent.find(
+                    (c) => c.code === selection.data.continentCode,
+                  );
+            if (!cont) return null;
+            return (
+              <div className="pointer-events-none absolute inset-0 z-40">
+                <div className="pointer-events-auto absolute inset-x-3 top-16 max-h-[calc(54vh-5rem)] overflow-y-auto sm:top-20 lg:inset-x-auto lg:right-4 lg:top-1/2 lg:max-h-[78vh] lg:w-[360px] lg:-translate-y-1/2">
+                  <ContinentCard
+                    continent={cont}
+                    latest={latest}
+                    onClose={onExplorerClose}
+                    initialCountry={selection.kind === "country" ? selection.data : null}
+                  />
+                </div>
+              </div>
+            );
+          })()}
       </section>
 
       {/* ════════════════════════════════════════════════════════════════

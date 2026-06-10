@@ -63,6 +63,62 @@ export function continentCentroid(name: string): LngLat | undefined {
   return CONTINENT_CENTROIDS[normName(name)];
 }
 
+// Centroides de país del exterior, por código ubigeo nivel-02 de ONPE → [lng, lat].
+// Cubre los ~47 países con votos reales (el resto cae al centro de su continente).
+export const COUNTRY_CENTROIDS: Record<string, LngLat> = {
+  "921300": [-98, 39], // Estados Unidos
+  "940900": [-3.7, 40.4], // España
+  "921000": [-70.6, -33.4], // Chile
+  "941700": [12.5, 41.9], // Italia
+  "920200": [-58.4, -34.6], // Argentina
+  "920600": [-79.4, 43.7], // Canadá
+  "920500": [-46.6, -23.5], // Brasil
+  "930700": [139.7, 35.7], // Japón
+  "920400": [-68.1, -16.5], // Bolivia
+  "940200": [13.4, 52.5], // Alemania
+  "921100": [-78.5, -0.2], // Ecuador
+  "920700": [-74.1, 4.7], // Colombia
+  "942800": [7.4, 46.9], // Suiza
+  "950100": [151.2, -33.9], // Australia
+  "921900": [-99.1, 19.4], // México
+  "940400": [4.4, 50.8], // Bélgica
+  "922100": [-79.5, 9.0], // Panamá
+  "920800": [-84.1, 9.9], // Costa Rica
+  "941200": [-0.1, 51.5], // Gran Bretaña
+  "942700": [18.1, 59.3], // Suecia
+  "922700": [-56.2, -34.9], // Uruguay
+  "941400": [4.9, 52.4], // Holanda
+  "922400": [-69.9, 18.5], // República Dominicana
+  "920100": [-68.9, 12.1], // Antillas Holandesas
+  "922200": [-57.6, -25.3], // Paraguay
+  "950200": [174.8, -36.8], // Nueva Zelanda
+  "922300": [-66.1, 18.4], // Puerto Rico
+  "940300": [16.4, 48.2], // Austria
+  "921500": [-90.5, 14.6], // Guatemala
+  "930600": [34.8, 32.1], // Israel
+  "940800": [12.6, 55.7], // Dinamarca
+  "942500": [-9.1, 38.7], // Portugal
+  "942000": [6.1, 49.6], // Luxemburgo
+  "930200": [116.4, 39.9], // China
+  "942900": [37.6, 55.8], // Rusia
+  "942300": [10.7, 59.9], // Noruega
+  "930100": [127.0, 37.6], // Corea
+  "941500": [19.0, 47.5], // Hungría
+  "944200": [1.5, 42.5], // Andorra
+  "941000": [24.9, 60.2], // Finlandia
+  "933700": [55.3, 25.3], // Emiratos Árabes Unidos
+  "940600": [14.4, 50.1], // República Checa
+  "942400": [21.0, 52.2], // Polonia
+  "921200": [-89.2, 13.7], // El Salvador
+  "941800": [-6.3, 53.3], // Irlanda
+  "922000": [-86.3, 12.1], // Nicaragua
+  "921700": [-87.2, 14.1], // Honduras
+};
+
+export function countryCentroid(code: string): LngLat | undefined {
+  return COUNTRY_CENTROIDS[code];
+}
+
 // Candidate name field names that may appear on a Peru departments GeoJSON.
 // We probe these in order to extract a department name from feature.properties.
 export const GEOJSON_NAME_FIELDS = [

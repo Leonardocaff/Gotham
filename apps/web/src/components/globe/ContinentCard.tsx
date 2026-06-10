@@ -204,12 +204,15 @@ export function ContinentCard({
   continent,
   latest,
   onClose,
+  initialCountry = null,
 }: {
   continent: ContinentStratum;
   latest: Latest;
   onClose: () => void;
+  /** When set (e.g. clicking a country marker on the globe), open straight into it. */
+  initialCountry?: CountryStratum | null;
 }) {
-  const [country, setCountry] = useState<CountryStratum | null>(null);
+  const [country, setCountry] = useState<CountryStratum | null>(initialCountry);
   const countries = (latest.exteriorByCountry ?? [])
     .filter((c) => c.continentCode === continent.code)
     .sort((a, b) => b.votos.sanchez + b.votos.keiko - (a.votos.sanchez + a.votos.keiko));

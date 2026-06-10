@@ -3,9 +3,14 @@
 ONPE sirve un SPA Angular detrás de fingerprinting anti-bot: un `requests`/`fetch`
 plano recibe el HTML del SPA, no JSON. El camino probado es `curl_cffi` impersonando
 Chrome (`impersonate="chrome124"`). Los endpoints de resultados son GET, sin auth.
+
+ONPE además bloquea por IP: a IPs de datacenter (GitHub Actions) les sirve el SPA de
+forma intermitente. Para data confiable en tiempo real se enruta por un proxy residencial
+vía la variable de entorno `ONPE_PROXY` (p.ej. `http://user:pass@host:port`).
 """
 from __future__ import annotations
 
+import os
 import time
 from typing import Any
 
@@ -22,11 +27,17 @@ class OnpeError(RuntimeError):
     pass
 
 
+def proxies() -> dict[str, str] | None:
+    """Proxy residencial opcional (sortea el bloqueo por IP de ONPE). Lee ONPE_PROXY."""
+    url = os.environ.get("ONPE_PROXY", "").strip()
+    return {"http": url, "https": url} if url else None
+
+
 class OnpeClient:
     """Sesión persistente con backoff exponencial. Reusar entre fetches."""
 
     def __init__(self) -> None:
-        self._s = requests.Session(impersonate=_IMPERSONATE)
+        self._s = requests.Session(impersonate=_IMPERSONATE, proxies=proxies())
         self._s.headers.update(
             {
                 "Referer": ORIGIN + "/",

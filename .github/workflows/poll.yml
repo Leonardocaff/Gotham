@@ -33,5 +33,6 @@ jobs:
         working-directory: engine
         env:
           BLOB_READ_WRITE_TOKEN: ${{ secrets.BLOB_READ_WRITE_TOKEN }}
+          ONPE_PROXY: ${{ secrets.ONPE_PROXY }}
         # ~4.5 min de ciclos de 60s, luego sale; el siguiente cron reanuda.
         run: timeout --preserve-status 270 python -u -m gotham.poll 60 || true

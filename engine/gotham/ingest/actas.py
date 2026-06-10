@@ -24,6 +24,7 @@ from typing import Any
 
 from curl_cffi import requests
 
+from . import client
 from ..config import COD_KEIKO, COD_SANCHEZ, ID_ELECCION, ORIGIN, BACKEND
 
 _IMPERSONATE = "chrome124"
@@ -34,7 +35,7 @@ def _session() -> requests.Session:
     """Una sesión curl_cffi por hilo (no compartir entre hilos)."""
     s = getattr(_tl, "s", None)
     if s is None:
-        s = requests.Session(impersonate=_IMPERSONATE)
+        s = requests.Session(impersonate=_IMPERSONATE, proxies=client.proxies())
         s.headers.update({"Referer": ORIGIN + "/", "Origin": ORIGIN,
                           "Accept": "application/json, text/plain, */*"})
         _tl.s = s

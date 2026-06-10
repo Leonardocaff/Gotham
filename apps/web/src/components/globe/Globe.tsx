@@ -9,13 +9,14 @@ import type {
   Geometry,
   Point,
 } from "geojson";
-import type { ContinentStratum, Stratum } from "@/lib/types";
+import type { ContinentStratum, CountryStratum, Stratum } from "@/lib/types";
 import {
   PERU_CENTER,
   PERU_GEOJSON_URLS,
   GEOJSON_NAME_FIELDS,
   deptCentroid,
   continentCentroid,
+  countryCentroid,
   normName,
 } from "@/lib/geo";
 import { leaderColor } from "@/lib/color";
@@ -36,13 +37,23 @@ const CONTESTED_BAND_PP = 6;
 export type GlobeSelection =
   | { kind: "dept"; data: Stratum }
   | { kind: "continent"; data: ContinentStratum }
+  | { kind: "country"; data: CountryStratum }
   | null;
 
 interface GlobeProps {
   strata: Stratum[];
   continents: ContinentStratum[];
+  countries: CountryStratum[];
   selection: GlobeSelection;
   onSelect: (sel: GlobeSelection) => void;
+}
+
+// El exterior se pinta en cálido para distinguirlo del Perú (frío): naranja si gana
+// Sánchez, rojo si gana Keiko. Así "cada país un color, anaranjado o rojo".
+const EXT_ORANGE = "#FFA53C";
+const EXT_RED = "#FF5C5C";
+function extColor(leader: "sanchez" | "keiko"): string {
+  return leader === "sanchez" ? EXT_ORANGE : EXT_RED;
 }
 
 type PointFC = FeatureCollection<Point, Record<string, unknown>>;
@@ -137,9 +148,35 @@ function continentPoints(continents: ContinentStratum[]): PointFC {
   return { type: "FeatureCollection", features };
 }
 
+/** Per-country exterior markers at their own centroids. Only countries we have
+ * coordinates for (the ones with real votes); the long tail stays in the card list. */
+function countryPoints(countries: CountryStratum[]): PointFC {
+  const features = countries
+    .map((c): Feature<Point, Record<string, unknown>> | null => {
+      const ctr = countryCentroid(c.code);
+      if (!ctr) return null;
+      const total = c.votos.sanchez + c.votos.keiko;
+      if (total < 20) return null; // ruido: 1–2 votos no merecen marcador
+      return {
+        type: "Feature",
+        properties: {
+          name: c.name,
+          code: c.code,
+          leader: c.leader,
+          color: extColor(c.leader),
+          total,
+        },
+        geometry: { type: "Point", coordinates: ctr },
+      };
+    })
+    .filter((f): f is Feature<Point, Record<string, unknown>> => f !== null);
+  return { type: "FeatureCollection", features };
+}
+
 export default function Globe({
   strata,
   continents,
+  countries,
   selection,
   onSelect,
 }: GlobeProps) {
@@ -155,9 +192,11 @@ export default function Globe({
   const [hover, setHover] = useState<HoverInfo | null>(null);
   const strataRef = useRef(strata);
   const continentsRef = useRef(continents);
+  const countriesRef = useRef(countries);
   const onSelectRef = useRef(onSelect);
   strataRef.current = strata;
   continentsRef.current = continents;
+  countriesRef.current = countries;
   onSelectRef.current = onSelect;
 
   // ── Initialise map once ────────────────────────────────────────────────
@@ -376,6 +415,39 @@ export default function Globe({
         },
       });
 
+      // ── Exterior country markers — warm dots (orange Sánchez / red Keiko),
+      //    clickable, at each country's own centroid. ──
+      map.addSource("countries", {
+        type: "geojson",
+        data: countryPoints(countriesRef.current),
+      });
+      map.addLayer({
+        id: "countries-dot",
+        type: "circle",
+        source: "countries",
+        paint: {
+          "circle-radius": [
+            "interpolate",
+            ["linear"],
+            ["get", "total"],
+            0,
+            3,
+            60000,
+            12,
+          ],
+          "circle-color": ["get", "color"],
+          "circle-stroke-color": "#0A0A0C",
+          "circle-stroke-width": 1,
+          "circle-opacity": 0.95,
+        },
+      });
+      map.addLayer({
+        id: "countries-hit",
+        type: "circle",
+        source: "countries",
+        paint: { "circle-radius": 13, "circle-color": "#000000", "circle-opacity": 0.001 },
+      });
+
       // ── Contested glow source (toss-up departments) ───────────────────────
       // Sits above the choropleth so the rose halo pulses over tight races.
       map.addSource("contested", {
@@ -573,13 +645,26 @@ export default function Globe({
         if (ctr) map.flyTo({ center: ctr, zoom: 2.4, duration: 1400 });
       };
 
+      const onCountryClick = (e: MapMouseEvent) => {
+        const f = e.features?.[0];
+        if (!f) return;
+        const code = f.properties?.code as string;
+        const c = countriesRef.current.find((x) => x.code === code);
+        if (!c) return;
+        interactedRef.current = true;
+        onSelectRef.current({ kind: "country", data: c });
+        const ctr = countryCentroid(c.code);
+        if (ctr) map.flyTo({ center: ctr, zoom: 3.2, duration: 1200 });
+      };
+
       map.on("click", deptClickLayer, onDeptClick);
       map.on("click", "continents-hit", onContinentClick);
+      map.on("click", "countries-hit", onCountryClick);
 
       // click empty space → national view
       map.on("click", (e: MapMouseEvent) => {
         const hits = map.queryRenderedFeatures(e.point, {
-          layers: [deptClickLayer, "continents-hit"].filter((l) =>
+          layers: [deptClickLayer, "continents-hit", "countries-hit"].filter((l) =>
             map.getLayer(l),
           ),
         });
@@ -591,7 +676,7 @@ export default function Globe({
         }
       });
 
-      for (const l of [deptClickLayer, "continents-hit"]) {
+      for (const l of [deptClickLayer, "continents-hit", "countries-hit"]) {
         if (!map.getLayer(l)) continue;
         map.on("mouseenter", l, () => {
           map.getCanvas().style.cursor = "pointer";
@@ -600,6 +685,29 @@ export default function Globe({
           map.getCanvas().style.cursor = "";
         });
       }
+
+      // ── HOVER de países del exterior: mismo tooltip vivo. ──
+      const onCountryMove = (e: MapMouseEvent) => {
+        const f = e.features?.[0];
+        const code = f?.properties?.code as string | undefined;
+        const c = code ? countriesRef.current.find((x) => x.code === code) : undefined;
+        if (!c) {
+          setHover(null);
+          return;
+        }
+        setHover({
+          name: c.name,
+          pctSanchez: c.pctSanchez,
+          leader: c.leader,
+          actasPct: c.actasPct,
+          votosS: c.votos.sanchez,
+          votosK: c.votos.keiko,
+          x: e.point.x,
+          y: e.point.y,
+        });
+      };
+      map.on("mousemove", "countries-hit", onCountryMove);
+      map.on("mouseleave", "countries-hit", () => setHover(null));
 
       // ── HOVER de continentes: mismo tooltip vivo que los departamentos. ──
       const onContinentMove = (e: MapMouseEvent) => {
@@ -708,11 +816,13 @@ export default function Globe({
     if (!map || !ready) return;
     const cSrc = map.getSource("continents") as GeoJSONSource | undefined;
     if (cSrc) cSrc.setData(continentPoints(continents));
+    const ctrySrc = map.getSource("countries") as GeoJSONSource | undefined;
+    if (ctrySrc) ctrySrc.setData(countryPoints(countries));
     const pSrc = map.getSource("dept-pts") as GeoJSONSource | undefined;
     if (pSrc) pSrc.setData(strataPoints(strata));
     const xSrc = map.getSource("contested") as GeoJSONSource | undefined;
     if (xSrc) xSrc.setData(contestedPoints(strata));
-  }, [strata, continents, ready, polyReady]);
+  }, [strata, continents, countries, ready, polyReady]);
 
   // ── Two-way link: reflect external selection (panel drills) on the globe ──
   // When the explorer changes the active department (province/district drill
@@ -730,7 +840,7 @@ export default function Globe({
       return;
     }
 
-    if (selection.kind === "continent") {
+    if (selection.kind === "continent" || selection.kind === "country") {
       // exterior selected → drop any department highlight; fly handled on click
       lastFlownRef.current = null;
       if (map.getLayer("depts-sel")) {
