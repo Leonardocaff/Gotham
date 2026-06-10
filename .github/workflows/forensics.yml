@@ -40,4 +40,4 @@ jobs:
           ONPE_PROXY: ${{ secrets.ONPE_PROXY }}
         # Cron → barrido completo; dispatch puede pasar un número para muestra rápida.
         # Concurrencia moderada (16) para no gatillar el rate-limit de ONPE en el barrido largo.
-        run: python -u -m gotham.deep_forensics "${{ github.event.inputs.target_mesas || 'full' }}" 16 || true
+        run: python -u -m gotham.deep_forensics "${{ github.event.inputs.target_mesas || 'full' }}" 10 || true
