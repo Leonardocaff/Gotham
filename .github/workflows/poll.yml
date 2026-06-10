@@ -1,0 +1,37 @@
+name: poll-onpe
+
+# Ingestión en la NUBE (no depende de ninguna máquina local). Corre el motor en un
+# runner de GitHub (curl_cffi funciona en Ubuntu), proyecta y publica latest.json,
+# history.jsonl y hierarchy.json a Vercel Blob, que es lo que lee el dashboard.
+#
+# El cron de GitHub es best-effort (~cada 5 min, puede demorarse). Para mitigar, cada
+# corrida hace ~4.5 min de ciclos de 60s, así durante la ventana hay frescura de ~60s.
+
+on:
+  schedule:
+    - cron: "*/5 * * * *"
+  workflow_dispatch: {}
+
+concurrency:
+  group: poll-onpe
+  cancel-in-progress: false
+
+jobs:
+  poll:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: engine/requirements.txt
+      - name: Instalar dependencias
+        run: pip install -r engine/requirements.txt
+      - name: Pollear ONPE y publicar a Blob
+        working-directory: engine
+        env:
+          BLOB_READ_WRITE_TOKEN: ${{ secrets.BLOB_READ_WRITE_TOKEN }}
+        # ~4.5 min de ciclos de 60s, luego sale; el siguiente cron reanuda.
+        run: timeout --preserve-status 270 python -u -m gotham.poll 60 || true
