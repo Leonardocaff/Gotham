@@ -34,6 +34,11 @@ body {
   overflow-x: hidden;
 }
 
+/* When a modal is open we lock the body so the page behind can't scroll. */
+body.modal-open {
+  overflow: hidden;
+}
+
 /*
  * Layered page atmosphere — all CSS, no JS.
  *  1. faint star field (two offset radial-dot grids)
@@ -134,6 +139,98 @@ body::after {
     inset 0 1px 0 0 rgba(255, 255, 255, 0.07);
 }
 
+/* ── Icon rail ─────────────────────────────────────────────────────────────
+ * A translucent glass spine floating at the edge of the stage. Stronger tint
+ * than the page cards because it sits ON the lit globe and must stay legible.
+ */
+.rail-glass {
+  background-color: rgba(12, 12, 16, 0.58);
+  backdrop-filter: blur(22px) saturate(160%);
+  -webkit-backdrop-filter: blur(22px) saturate(160%);
+  border: 1px solid var(--edge-strong);
+  box-shadow:
+    0 30px 70px -28px rgba(0, 0, 0, 0.9),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.06);
+}
+
+/* ── Translucent command modal ─────────────────────────────────────────────
+ * Glassmorphism taken further than the cards: deeper blur, near-translucent
+ * dark fill so the planet still reads behind the scrim, hairline border, a
+ * soft outer glow and an inner top highlight (the lit lip of the glass).
+ */
+.modal-glass {
+  background-color: rgba(12, 12, 16, 0.62);
+  backdrop-filter: blur(40px) saturate(160%);
+  -webkit-backdrop-filter: blur(40px) saturate(160%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow:
+    0 50px 120px -40px rgba(0, 0, 0, 0.95),
+    0 12px 40px -18px rgba(0, 0, 0, 0.8),
+    0 0 0 1px rgba(255, 255, 255, 0.02),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.07);
+}
+
+/* Inside the modal the panel components would otherwise double-frame (each one
+ * is its own .glass / .glass-2 card). This wrapper neutralises that inner chrome
+ * so the panel reads as raw content inside the single modal shell — no nested
+ * borders, shadows, blur, hover-lift or float drift. The panels stay untouched. */
+.modal-unframe > .glass,
+.modal-unframe > .glass-2,
+.modal-unframe > section.glass,
+.modal-unframe > section.glass-2 {
+  background-color: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  padding: 0;
+  animation: none;
+}
+.modal-unframe > .glass.lift:hover,
+.modal-unframe > .glass-2:hover {
+  transform: none;
+  border: none;
+  box-shadow: none;
+}
+
+/* Modal enter — fade + gentle scale for desktop, fade + rise for the sheet. */
+@keyframes modalScaleIn {
+  0% {
+    opacity: 0;
+    transform: translateY(8px) scale(0.97);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+@keyframes sheetRiseIn {
+  0% {
+    transform: translateY(100%);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+@keyframes scrimIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+.animate-modalIn {
+  animation: modalScaleIn 0.24s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+.animate-sheetIn {
+  animation: sheetRiseIn 0.28s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+.animate-scrimIn {
+  animation: scrimIn 0.2s ease-out both;
+}
+
 /* ── Hover lift ────────────────────────────────────────────────────────── */
 .lift {
   transition:
@@ -206,6 +303,11 @@ body::after {
   }
   .lift:hover {
     transform: none;
+  }
+  .animate-modalIn,
+  .animate-sheetIn,
+  .animate-scrimIn {
+    animation: none;
   }
 }
 
