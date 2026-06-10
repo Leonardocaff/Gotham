@@ -40,10 +40,10 @@ _LAST_DIGIT_MAD = 0.008
 def _digit_battery(s_votes: list[int], k_votes: list[int]) -> list[dict[str, Any]]:
     base_caveat = (
         "Test de Beber-Scacco (2012): bajo conteo honesto el último dígito de un conteo ≥25 es "
-        "~Uniforme(0–9), sin importar la magnitud. Veredicto anclado en el tamaño de efecto "
-        "(MAD), no solo en p, por el problema de N grande. NO usamos Benford a nivel mesa: los "
-        "conteos acotados violan su supuesto y dan falsos positivos. Un rechazo indica dónde "
-        "auditar, no prueba fraude.")
+        "~Uniforme(0–9), sin importar la magnitud. El veredicto se ancla en el tamaño de efecto "
+        "(MAD) para evitar las falsas alarmas que da el p-valor con N grande. A nivel mesa "
+        "evitamos Benford: los conteos acotados violan su supuesto y disparan falsos positivos. "
+        "Un rechazo solo indica dónde auditar.")
     return [
         _digit_signal("mesa_last_pooled", "Último dígito (ambos candidatos)",
                       s_votes + k_votes, _last_digit, _UNIFORM_10,
@@ -167,7 +167,7 @@ def analyze(scan: dict[str, Any]) -> dict[str, Any]:
         verdict = "REVISAR"
         summary = (f"Hay una señal de dígitos que vale revisar: {names}"
                    + (f", más {impossible['count']} mesa(s) con números que no cuadran." if integrity_breach else ".")
-                   + " Que falle no prueba fraude; solo dice qué acta física conviene auditar.")
+                   + " Esto solo apunta a qué acta física conviene auditar.")
 
     return {
         "level": "mesa",

@@ -15,9 +15,10 @@ from .config import CANDIDATES, HIERARCHY_PATH, HISTORY_PATH, LATEST_PATH
 from .snapshot import Snapshot
 
 CAVEAT = (
-    "Esto es una proyección, no el resultado oficial. El conteo de ONPE no es la "
-    "proclamación del JNE, que llega semanas después y puede anular o reasignar actas. "
-    "Con menos del 97% contado y un margen por debajo de 0.5pp, la elección sigue abierta."
+    "El resultado oficial lo da el JNE semanas después, cuando termina de resolver las "
+    "actas observadas y los pedidos de nulidad. Esto es una proyección estadística sobre "
+    "el conteo de ONPE. Con menos del 97% contado y un margen bajo 0.5pp, la elección "
+    "sigue abierta."
 )
 
 

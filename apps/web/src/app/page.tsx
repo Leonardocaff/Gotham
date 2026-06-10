@@ -298,7 +298,7 @@ export default function Page() {
         <Methodology latest={latest} />
 
         <p className="px-1 pt-1 text-center text-[10px] leading-snug text-ink-3">
-          Es una proyección, no el resultado oficial del JNE.
+          El resultado oficial lo da el JNE. Esto es una proyección.
         </p>
       </aside>
     </main>

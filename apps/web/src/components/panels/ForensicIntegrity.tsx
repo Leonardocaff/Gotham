@@ -15,7 +15,7 @@ export function ForensicIntegrity({ latest }: { latest: Latest }) {
   return (
     <Panel
       title="Forense · integridad del conteo"
-      hint="Pruebas estadísticas para detectar anomalías. No prueban fraude; señalan dónde mirar."
+      hint="Pruebas estadísticas para detectar anomalías. Solo señalan dónde mirar."
       aside={<VerdictChip verdict={clean ? "NORMAL" : "ATENCION"} label={overall.verdict} />}
     >
       {/* Síntesis honesta */}
@@ -63,8 +63,8 @@ export function ForensicIntegrity({ latest }: { latest: Latest }) {
                 ? pct(ledger.swingNeededFrac * 100, 1)
                 : "—"}
             </span>{" "}
-            de ellos ya hay empate. Por eso el veredicto no es “decidido”: es una
-            duda legal, no una señal de fraude.
+            de ellos ya hay empate. Por eso el veredicto sigue en “inclinado”:
+            queda una duda legal por resolver.
           </>
         ) : (
           <>

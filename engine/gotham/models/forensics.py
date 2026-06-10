@@ -147,8 +147,8 @@ def analyze(districts: list[dict[str, Any]], snap: Snapshot) -> dict[str, Any]:
     pooled = s_votes + k_votes                      # ambos candidatos → máxima N
 
     benford2_caveat = ("2BL (Mebane) es el test preferido en forense electoral, pero un "
-                       "rechazo NO prueba fraude: la heterogeneidad de tamaños distritales "
-                       "puede desviarlo. Es un tamiz, no veredicto.")
+                       "rechazo solo orienta la auditoría: la heterogeneidad de tamaños "
+                       "distritales puede desviarlo por sí sola.")
     benford1_caveat = ("La ley de Benford sobre datos electorales produce falsos positivos "
                        "(Deckert et al. 2011). Suplementario; se pondera por debajo del 2BL.")
     last_caveat = ("Potente a nivel MESA; aquí los totales distritales son sumas de ~48 "
@@ -171,20 +171,18 @@ def analyze(districts: list[dict[str, Any]], snap: Snapshot) -> dict[str, Any]:
     if not flagged:
         overall_verdict = "SIN INDICIOS"
         summary = ("Las tres pruebas de dígitos (Benford 1° y 2° dígito, último dígito) salen "
-                   "limpias. No hay rastro estadístico de manipulación en lo publicado. Lo que "
-                   "queda abierto es por cuánto falta contar, no por la integridad del conteo.")
+                   "limpias. No hay rastro estadístico de manipulación en lo publicado. Lo único "
+                   "que queda abierto es cuánto falta por contar.")
     else:
         names = ", ".join(s["label"] for s in flagged)
         overall_verdict = "REVISAR"
-        summary = (f"Hay una señal que vale revisar: {names}. Que Benford se desvíe no prueba "
-                   "fraude (suele dar falsas alarmas); solo indica qué actas conviene auditar "
-                   "una por una.")
+        summary = (f"Hay una señal que vale revisar: {names}. Benford a veces da falsas alarmas, "
+                   "así que esto solo apunta a qué actas conviene auditar una por una.")
 
     return {
         "signals": signals,
         "ledger": ledger,
         "overall": {"verdict": overall_verdict, "summary": summary},
-        "disclaimer": ("Es un tamiz estadístico, no una prueba. Ninguna de estas señales acusa "
-                       "fraude por sí sola; solo dice dónde mirar. Quien valida y proclama las "
-                       "actas es el JNE, no este modelo."),
+        "disclaimer": ("Es un tamiz estadístico. Ninguna de estas señales acusa fraude por sí "
+                       "sola; solo dicen dónde mirar. Quien valida y proclama las actas es el JNE."),
     }
