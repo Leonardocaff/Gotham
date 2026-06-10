@@ -18,6 +18,7 @@ import { ActasComposition } from "@/components/panels/ActasComposition";
 import { ContestedGrid } from "@/components/panels/ContestedGrid";
 import { Sensitivity } from "@/components/panels/Sensitivity";
 import { OvertakeThreshold } from "@/components/panels/OvertakeThreshold";
+import { Crossover } from "@/components/panels/Crossover";
 import { ManskiBounds } from "@/components/panels/ManskiBounds";
 import { ForensicIntegrity } from "@/components/panels/ForensicIntegrity";
 import { DeepForensics } from "@/components/panels/DeepForensics";
@@ -277,6 +278,7 @@ export default function Page() {
         <Uncertainty latest={latest} />
         <ManskiBounds latest={latest} />
         <Sensitivity latest={latest} />
+        <Crossover history={history} />
         <OvertakeThreshold latest={latest} />
         <ActasComposition latest={latest} />
 

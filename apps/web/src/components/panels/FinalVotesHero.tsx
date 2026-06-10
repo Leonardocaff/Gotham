@@ -62,7 +62,7 @@ function Counter({
       </span>
 
       <span
-        className={`tnum mt-3 max-w-full truncate font-mono text-[1.6rem] font-semibold leading-none tracking-tight min-[400px]:text-[2rem] sm:text-4xl lg:text-[1.75rem] xl:text-[2rem] ${
+        className={`tnum mt-3 max-w-full truncate font-mono text-[1.5rem] font-semibold leading-none tracking-tight min-[400px]:text-[1.9rem] sm:text-4xl lg:text-[1.5rem] xl:text-[1.75rem] ${
           flash ? "animate-flash" : ""
         }`}
         style={{

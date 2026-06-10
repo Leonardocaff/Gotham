@@ -21,9 +21,23 @@ const grotesk = Space_Grotesk({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://sirius.kiranir.com"),
   title: "GOTHAM — Inteligencia Electoral · 2da Vuelta Perú 2026",
   description:
-    "Proyección estadística en vivo de la segunda vuelta presidencial 2026: Sánchez vs Fujimori.",
+    "Proyección estadística en vivo de la segunda vuelta presidencial 2026: Sánchez vs Fujimori. Estimador estratificado, forense electoral y analista IA.",
+  openGraph: {
+    title: "GOTHAM — Proyección 2da Vuelta Perú 2026",
+    description:
+      "Proyección estadística en vivo: estimador estratificado, forense electoral (Benford/último dígito) y analista IA.",
+    type: "website",
+    locale: "es_PE",
+    siteName: "GOTHAM",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "GOTHAM — Proyección 2da Vuelta Perú 2026",
+    description: "Proyección estadística en vivo de la 2da vuelta presidencial 2026.",
+  },
 };
 
 export const viewport: Viewport = {

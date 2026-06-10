@@ -15,7 +15,7 @@ from __future__ import annotations
 from typing import Any
 
 from ..config import COD_KEIKO, COD_SANCHEZ, ID_ELECCION
-from .client import OnpeClient
+from .client import OnpeClient, OnpeError
 
 
 def fetch_active_election(c: OnpeClient) -> dict[str, Any]:
@@ -103,6 +103,26 @@ def fetch_ubigeo_names(c: OnpeClient) -> dict[str, str]:
     """ubigeo 6-dígitos → nombre 'DEPARTAMENTO \\ PROVINCIA \\ DISTRITO'."""
     data = c.get("ubigeos/dep-prov-distritos", idEleccion=ID_ELECCION)
     return {str(d["ubigeo"]).zfill(6): d["nombre"] for d in data}
+
+
+_CONTINENT_UBIGEOS = ("910000", "920000", "930000", "940000", "950000")
+
+
+def fetch_exterior_country_names(c: OnpeClient) -> dict[str, str]:
+    """ubigeo nivel-02 del exterior (país, p.ej. '920200') → nombre ('ARGENTINA').
+
+    Recorre los 5 continentes (`ubigeos/provincias` con idUbigeoDepartamento=continente).
+    Vía GET (el POST del SPA cae al SPA). Estático durante la elección."""
+    out: dict[str, str] = {}
+    for cont in _CONTINENT_UBIGEOS:
+        try:
+            data = c.get("ubigeos/provincias", idEleccion=ID_ELECCION,
+                         idAmbitoGeografico=2, idUbigeoDepartamento=cont)
+        except OnpeError:
+            continue
+        for d in data or []:
+            out[str(d["ubigeo"])] = d["nombre"]
+    return out
 
 
 def fetch_exterior_strata(c: OnpeClient) -> list[dict[str, Any]]:

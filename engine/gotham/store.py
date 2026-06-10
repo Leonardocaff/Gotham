@@ -83,7 +83,33 @@ def _exterior_by_continent(snap: Snapshot) -> list[dict]:
     return out
 
 
-def build_contract(snap: Snapshot, result: dict, forensic: dict | None = None) -> dict:
+def _exterior_by_country(snap: Snapshot, names: dict[str, str] | None) -> list[dict]:
+    """Per-country exterior strata (nivel_02) with names — so each country (Argentina,
+    Brasil, …) is clickable. continentCode matches exteriorByContinent for grouping."""
+    from .models.stratified import stratum_remaining_votes
+    names = names or {}
+    out = []
+    for s in snap.exterior_strata:
+        total = s.votos_sanchez + s.votos_keiko
+        code = str(s.prov_code)
+        cont = s.dep_code.replace("EXT", "")[:2]
+        out.append({
+            "code": code,
+            "continentCode": cont,
+            "name": (names.get(code) or names.get(str(s.prov_code).zfill(6)) or code).title(),
+            "votos": {"sanchez": s.votos_sanchez, "keiko": s.votos_keiko},
+            "pctSanchez": round(100 * s.votos_sanchez / total, 2) if total else 0,
+            "leader": "sanchez" if s.votos_sanchez >= s.votos_keiko else "keiko",
+            "actasPct": round(s.pct_actas, 2),
+            "remainingVotesEst": round(stratum_remaining_votes(s)),
+        })
+    # más votos primero — los países con data real arriba
+    out.sort(key=lambda c: -(c["votos"]["sanchez"] + c["votos"]["keiko"]))
+    return out
+
+
+def build_contract(snap: Snapshot, result: dict, forensic: dict | None = None,
+                   ext_country_names: dict[str, str] | None = None) -> dict:
     margin_leader = snap.leader
     return {
         "generatedAt": datetime.now(timezone.utc).isoformat(),
@@ -120,6 +146,7 @@ def build_contract(snap: Snapshot, result: dict, forensic: dict | None = None) -
         "models": result["models"],
         "strata": _departments(snap),
         "exteriorByContinent": _exterior_by_continent(snap),
+        "exteriorByCountry": _exterior_by_country(snap, ext_country_names),
         "forensics": forensic,
         "caveat": CAVEAT,
     }

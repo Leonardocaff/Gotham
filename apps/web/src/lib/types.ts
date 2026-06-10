@@ -152,6 +152,19 @@ export interface ContinentStratum {
   remainingVotesEst: number;
 }
 
+/** A single foreign country's exterior result (nivel_02). `continentCode`
+ * matches ContinentStratum.code so a continent card can list its countries. */
+export interface CountryStratum {
+  code: string;
+  continentCode: string;
+  name: string;
+  votos: Record<CandidateKey, number>;
+  pctSanchez: number;
+  leader: CandidateKey;
+  actasPct: number;
+  remainingVotesEst: number;
+}
+
 // ── Forensics — anomaly screening, NOT a fraud accusation ───────────────────
 
 export type ForensicVerdict = "NORMAL" | "ATENCION" | "N/A";
@@ -257,6 +270,7 @@ export interface Latest {
   models: ModelResult[];
   strata: Stratum[];
   exteriorByContinent: ContinentStratum[];
+  exteriorByCountry?: CountryStratum[];
   forensics?: Forensics | null;
   caveat: string;
 }

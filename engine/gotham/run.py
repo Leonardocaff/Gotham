@@ -24,7 +24,11 @@ def run_once(verbose: bool = True) -> dict:
     # UNA vez y se reusa para no duplicar la llamada de 1,892 filas por ciclo.
     districts = onpe.fetch_districts(c)
     forensic = forensics.analyze(districts, snap)
-    contract = build_contract(snap, result, forensic)
+    try:
+        ext_names = onpe.fetch_exterior_country_names(c)   # nombres de países (estático)
+    except Exception:  # noqa: BLE001 — no romper el ciclo por los nombres del exterior
+        ext_names = {}
+    contract = build_contract(snap, result, forensic, ext_names)
     write_latest(contract)
     append_history(contract)
 
