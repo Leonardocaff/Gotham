@@ -48,17 +48,23 @@ class OnpeClient:
                 r = self._s.get(url, params=params, timeout=25)
                 ct = r.headers.get("content-type", "")
                 if "json" not in ct:
-                    # nginx cae al index.html del SPA cuando la ruta/params no matchean
-                    raise OnpeError(
+                    # El CDN/anti-bot de ONPE a veces sirve el index.html del SPA aun para
+                    # un GET válido (respuesta transitoria bajo carga / cold edge). Lo
+                    # tratamos como reintentable, no como error de ruta inmediato.
+                    last_exc = OnpeError(
                         f"respuesta no-JSON ({len(r.text)}B) para {path} {params} "
-                        f"[HTTP {r.status_code} {ct}] — ¿ruta o params inválidos?"
+                        f"[HTTP {r.status_code} {ct}] — SPA fallback (transitorio)"
                     )
+                    if attempt < _RETRIES - 1:
+                        time.sleep(_BACKOFF[attempt])
+                        continue
+                    raise last_exc
                 body = r.json()
                 if not body.get("success", False):
                     raise OnpeError(f"success=False para {path}: {body.get('message')!r}")
                 return body.get("data")
             except OnpeError:
-                raise  # error de contrato, no de red: no reintentar
+                raise  # error de contrato (success=False / no-JSON agotado): no reintentar
             except Exception as e:  # noqa: BLE001 — red/timeout/TLS
                 last_exc = e
                 if attempt < _RETRIES - 1:

@@ -18,6 +18,7 @@ profundo MUESTREA distritos (PPS) para correr en minutos con potencia estadísti
 from __future__ import annotations
 
 import threading
+import time
 from concurrent.futures import ThreadPoolExecutor
 from typing import Any
 
@@ -57,13 +58,22 @@ def _get(path: str, _retries: int = 2, **params: Any) -> Any | None:
 
 
 def list_district_actas(ubigeo: int, ambito: int = 1) -> list[dict[str, Any]]:
-    """Todas las actas (metadata, incl. `id`) de un distrito; sigue la paginación."""
+    """Todas las actas (metadata, incl. `id`) de un distrito; sigue la paginación.
+
+    Todo distrito tiene ≥1 acta, así que una primera página vacía/None es señal de
+    throttle del CDN (SPA fallback) — se reintenta con backoff antes de rendirse, para
+    que el barrido completo no pierda distritos enteros bajo carga."""
     out: list[dict[str, Any]] = []
     page = 1
+    first_empty_tries = 0
     while True:
         d = _get("actas", pagina=page, tamanio=500, idEleccion=ID_ELECCION,
                  idAmbitoGeografico=ambito, idUbigeo=ubigeo)
         if not d or not d.get("content"):
+            if page == 1 and first_empty_tries < 4:   # probable throttle: reintentar
+                first_empty_tries += 1
+                time.sleep(0.5 * first_empty_tries)
+                continue
             break
         out.extend(d["content"])
         if page >= int(d.get("totalPaginas", 1)):
