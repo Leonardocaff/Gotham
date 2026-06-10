@@ -8,6 +8,7 @@ import { DrillDown } from "@/components/globe/DrillDown";
 import { Header } from "@/components/panels/Header";
 import { Verdict } from "@/components/panels/Verdict";
 import { FinalVotesHero, FinalVotesChip } from "@/components/panels/FinalVotesHero";
+import { AnalystBriefing } from "@/components/panels/AnalystBriefing";
 import { NowVsProjection } from "@/components/panels/NowVsProjection";
 import { Uncertainty } from "@/components/panels/Uncertainty";
 import { Methods } from "@/components/panels/Methods";
@@ -187,6 +188,11 @@ export default function Page() {
        * floating over the globe). */}
       <div className="mt-4 lg:hidden">
         <Verdict latest={latest} />
+      </div>
+
+      {/* ── AI analyst — live intelligence briefing + Q&A, grounded in the model. */}
+      <div className="mt-5">
+        <AnalystBriefing latest={latest} />
       </div>
 
       {/* ── Analyst grid ───────────────────────────────────────────────────
