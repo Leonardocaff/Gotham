@@ -15,19 +15,35 @@ from __future__ import annotations
 import json
 import os
 import sys
+import time
 from datetime import datetime, timezone
 
 from .config import DEEP_FORENSICS_PATH
 from .ingest import actas, onpe
-from .ingest.client import OnpeClient
+from .ingest.client import OnpeClient, OnpeError
 from .models import mesa_forensics
 from .publish import is_enabled, publish_deep_forensics
+
+
+def _fetch_districts_patient(c, tries: int = 10, wait: float = 18.0, verbose: bool = True):
+    """ONPE sirve el SPA (anti-bot) a IPs de datacenter de forma intermitente. En vez de
+    morir en el primer bloqueo, esperamos una ventana desbloqueada (hasta ~3 min)."""
+    last = None
+    for i in range(tries):
+        try:
+            return onpe.fetch_districts(c)
+        except OnpeError as e:  # SPA fallback / bloqueo: reintentar tras una pausa
+            last = e
+            if verbose:
+                print(f"  ! districts bloqueado (intento {i + 1}/{tries}); reintentando en {wait:.0f}s…")
+            time.sleep(wait)
+    raise last if last else OnpeError("districts: agotados los reintentos")
 
 
 def run_deep(target_mesas: int = 11000, workers: int = 24, seed: int = 1,
              full: bool = False, verbose: bool = True) -> dict:
     c = OnpeClient()
-    districts = onpe.fetch_districts(c)
+    districts = _fetch_districts_patient(c, verbose=verbose)
     if full:
         if verbose:
             print(f"  distritos: {len(districts)} · BARRIDO COMPLETO (~92.7k mesas)…")

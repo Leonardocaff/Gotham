@@ -14,8 +14,8 @@ from curl_cffi import requests
 from ..config import BACKEND, ORIGIN
 
 _IMPERSONATE = "chrome124"
-_RETRIES = 3
-_BACKOFF = (0.5, 1.0, 2.0)
+_RETRIES = 5
+_BACKOFF = (0.5, 1.0, 2.0, 4.0, 8.0)
 
 
 class OnpeError(RuntimeError):
