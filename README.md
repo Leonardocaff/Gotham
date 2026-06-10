@@ -5,6 +5,23 @@ Sánchez vs Keiko Fujimori). Ingiere el avance de actas de ONPE y proyecta el re
 final con un estimador estratificado de población finita — corrigiendo el sesgo de reporte
 diferencial que hace engañoso el titular del conteo.
 
+🌐 **Live:** https://gotham-wine.vercel.app
+
+## Data en vivo (Vercel Blob)
+
+El dashboard desplegado lee el contrato desde **Vercel Blob** (`NEXT_PUBLIC_DATA_BASE_URL`),
+no de archivos estáticos — así actualiza sin redeploy. El poller publica a Blob cada ciclo
+si `BLOB_READ_WRITE_TOKEN` está en el entorno:
+
+```bash
+cd engine
+export BLOB_READ_WRITE_TOKEN=$(cd ../apps/web && vercel env pull /tmp/g.env --environment=production --yes >/dev/null && grep BLOB /tmp/g.env | cut -d= -f2- | tr -d '"')
+python -m gotham.poll 60        # publica a Blob cada 60s → dashboard live
+```
+
+Para que quede corriendo siempre: un `launchd`/`systemd`/`cron` que ejecute el poller, o
+déjalo en un `tmux`. Sin el token, el poller solo escribe local (modo dev).
+
 > **Proyección estadística, NO resultado oficial.** El conteo ONPE no es la proclamación
 > del JNE. Ver `METHODOLOGY.md`.
 
