@@ -46,7 +46,8 @@ def run_deep(target_mesas: int = 11000, workers: int = 24, seed: int = 1,
     districts = _fetch_districts_patient(c, verbose=verbose)
     if full:
         if verbose:
-            print(f"  distritos: {len(districts)} · BARRIDO COMPLETO (~92.7k mesas)…")
+            print(f"  distritos: {len(districts)} · BARRIDO COMPLETO "
+                  f"(todo el detalle de acta que expone ONPE, ~41k de ~90k)…")
         scan = actas.fetch_all_mesas(districts, workers=workers)
     else:
         if verbose:

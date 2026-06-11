@@ -305,7 +305,7 @@ export default function Page() {
 
         {/* integridad / forense */}
         <ForensicIntegrity latest={latest} />
-        <DeepForensics data={deepForensics.data} />
+        <DeepForensics data={deepForensics.data} countedActas={latest.count.contabilizadas} />
 
         {/* geografía */}
         <Exterior latest={latest} />

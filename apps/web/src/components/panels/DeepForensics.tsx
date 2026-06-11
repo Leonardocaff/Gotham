@@ -37,15 +37,26 @@ function TurnoutHistogram({
   );
 }
 
-export function DeepForensics({ data }: { data: DeepForensicsData | null }) {
+export function DeepForensics({
+  data,
+  countedActas,
+}: {
+  data: DeepForensicsData | null;
+  /** Actas contabilizadas a nivel nacional, para mostrar la cobertura real. */
+  countedActas?: number;
+}) {
   if (!data) return null;
   const { overall, signals, impossible, participation, estados, meta } = data;
   const clean = overall.verdict === "SIN INDICIOS";
+  const coverage =
+    countedActas && countedActas > 0
+      ? ` (~${Math.round((meta.mesasFetched / countedActas) * 100)}% del detalle que expone ONPE)`
+      : "";
 
   return (
     <Panel
       title="Forense profundo · nivel mesa"
-      hint={`Análisis mesa por mesa: ${int(meta.mesasFetched)} mesas en ${meta.districtsSampled} distritos de ${meta.departmentsCovered} departamentos`}
+      hint={`Análisis mesa por mesa sobre ${int(meta.mesasFetched)} actas con detalle disponible${coverage}`}
       aside={<VerdictChip verdict={clean ? "NORMAL" : "ATENCION"} label={overall.verdict} />}
     >
       <p className="text-[11px] leading-snug text-ink-2">{overall.summary}</p>

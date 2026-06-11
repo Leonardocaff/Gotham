@@ -175,8 +175,13 @@ def _fetch_details(ids: list[int], workers: int) -> list[dict[str, Any]]:
 
 
 def fetch_all_mesas(districts: list[dict[str, Any]], workers: int = 28) -> dict[str, Any]:
-    """Barrido COMPLETO: TODAS las mesas del país (~92.7k). Lista cada distrito y trae
-    el detalle de cada acta en paralelo. ~25 min. Para cobertura total (no muestral)."""
+    """Barrido COMPLETO: todas las actas con detalle disponible. Lista cada distrito y
+    trae el detalle de cada acta en paralelo.
+
+    NOTA: ONPE expone el detalle de acta de solo ~41k de las ~90k contabilizadas. La API
+    afirma ~90k en `totalRegistros`, pero al paginar entrega ~41k de forma determinista
+    (las páginas restantes vienen vacías); el resto solo existe en agregado. 41k (N≈82k
+    dígitos) es de sobra concluyente para el forense."""
     ids: list[int] = []
     with ThreadPoolExecutor(max_workers=workers) as ex:
         for actas in ex.map(lambda d: list_district_actas(int(d["dist_code"])), districts):
